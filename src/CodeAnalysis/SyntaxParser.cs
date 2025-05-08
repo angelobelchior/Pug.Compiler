@@ -51,35 +51,6 @@ public class SyntaxParser(List<Token> tokens)
     private double EvaluateToken()
     {
         var token = CurrentToken;
-
-        // if (token.Type == TokenType.Function)
-        // {
-        //     NextIfTokenIs(TokenType.Function);
-        //     NextIfTokenIs(TokenType.OpenParenthesis);
-        //
-        //     var args = new List<double>();
-        //
-        //     if (CurrentToken.Type != TokenType.CloseParenthesis)
-        //     {
-        //         args.Add(Parse());
-        //
-        //         while (CurrentToken.Type == TokenType.Comma)
-        //         {
-        //             NextIfTokenIs(TokenType.Comma);
-        //             args.Add(EvaluateExpressionWithPriority());
-        //         }
-        //     }
-        //
-        //     while (CurrentToken.Type == TokenType.Comma)
-        //     {
-        //         NextIfTokenIs(TokenType.Comma);
-        //         args.Add(EvaluateExpressionWithPriority());
-        //     }
-        //
-        //     NextIfTokenIs(TokenType.CloseParenthesis);
-        //
-        //     return InvokeMethod(token, args);
-        // }
         
         if (token.Type == TokenType.Function)
         {
