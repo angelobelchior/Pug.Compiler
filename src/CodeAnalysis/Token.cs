@@ -13,4 +13,8 @@ public record Token(TokenType Type, string Value, int Position)
     
     public static Token OpenParenthesis(int position) => new(TokenType.OpenParenthesis, "(", position);
     public static Token CloseParenthesis(int position) => new(TokenType.CloseParenthesis, ")", position);
+    
+    public static Token Function(int position, string value) => new(TokenType.Function, value, position);
+    public static Token Comma(int position) => new(TokenType.Comma, ",", position);
+
 }

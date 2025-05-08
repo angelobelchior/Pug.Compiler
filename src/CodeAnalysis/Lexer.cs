@@ -29,6 +29,12 @@ public class Lexer
                 IgnoreWhitespace();
                 continue;
             }
+            
+            if (char.IsLetter(_currentChar))
+            {
+                tokens.Add(ExtractFunction());
+                continue;
+            }
 
             if (_currentChar == '-' && char.IsDigit(Peek()))
             {
@@ -106,5 +112,17 @@ public class Lexer
     {
         while (char.IsWhiteSpace(_currentChar))
             Next();
+    }
+    
+    private Token ExtractFunction()
+    {
+        var result = new StringBuilder();
+        while (char.IsLetter(_currentChar))
+        {
+            result.Append(_currentChar);
+            Next();
+        }
+        var value = result.ToString();
+        return Token.Function(_currentPosition, value);
     }
 }

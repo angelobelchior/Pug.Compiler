@@ -52,6 +52,35 @@ public class SyntaxParser(List<Token> tokens)
     {
         var token = CurrentToken;
 
+        // if (token.Type == TokenType.Function)
+        // {
+        //     NextIfTokenIs(TokenType.Function);
+        //     NextIfTokenIs(TokenType.OpenParenthesis);
+        //
+        //     var args = new List<double>();
+        //
+        //     if (CurrentToken.Type != TokenType.CloseParenthesis)
+        //     {
+        //         args.Add(Parse());
+        //
+        //         while (CurrentToken.Type == TokenType.Comma)
+        //         {
+        //             NextIfTokenIs(TokenType.Comma);
+        //             args.Add(EvaluateExpressionWithPriority());
+        //         }
+        //     }
+        //
+        //     while (CurrentToken.Type == TokenType.Comma)
+        //     {
+        //         NextIfTokenIs(TokenType.Comma);
+        //         args.Add(EvaluateExpressionWithPriority());
+        //     }
+        //
+        //     NextIfTokenIs(TokenType.CloseParenthesis);
+        //
+        //     return InvokeMethod(token, args);
+        // }
+        
         if (token.Type == TokenType.Function)
         {
             NextIfTokenIs(TokenType.Function);
@@ -66,14 +95,8 @@ public class SyntaxParser(List<Token> tokens)
                 while (CurrentToken.Type == TokenType.Comma)
                 {
                     NextIfTokenIs(TokenType.Comma);
-                    args.Add(EvaluateExpressionWithPriority());
+                    args.Add(Parse());
                 }
-            }
-
-            while (CurrentToken.Type == TokenType.Comma)
-            {
-                NextIfTokenIs(TokenType.Comma);
-                args.Add(EvaluateExpressionWithPriority());
             }
 
             NextIfTokenIs(TokenType.CloseParenthesis);
@@ -137,7 +160,7 @@ public class SyntaxParser(List<Token> tokens)
             : throw new Exception("Invalid number of arguments for min"),
         
         "max" => args.Count == 2
-            ? Math.Min(args[0], args[1])
+            ? Math.Max(args[0], args[1])
             : throw new Exception("Invalid number of arguments for max"),
 
         "round" => args.Count switch
