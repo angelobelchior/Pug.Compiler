@@ -1,6 +1,6 @@
 namespace Pug.Compiler.CodeAnalysis;
 
-public class Parser(List<Token> tokens)
+public class SyntaxParser(List<Token> tokens)
 {
     private Token CurrentToken => tokens[_currentPosition];
 
@@ -8,26 +8,26 @@ public class Parser(List<Token> tokens)
 
     public double Parse()
     {
-        var result = EvaluateExpression();
+        var result = EvaluateExpressionWithPriority();
 
         while (CurrentToken.Type is TokenType.Plus or TokenType.Minus)
         {
             if (CurrentToken.Type == TokenType.Plus)
             {
                 CheckToken(TokenType.Plus);
-                result += EvaluateExpression();
+                result += EvaluateExpressionWithPriority();
             }
             else if (CurrentToken.Type == TokenType.Minus)
             {
                 CheckToken(TokenType.Minus);
-                result -= EvaluateExpression();
+                result -= EvaluateExpressionWithPriority();
             }
         }
 
         return result;
     }
 
-    private double EvaluateExpression()
+    private double EvaluateExpressionWithPriority()
     {
         var result = EvaluateToken();
 
@@ -78,7 +78,7 @@ public class Parser(List<Token> tokens)
             return result;
         }
 
-        throw new Exception($"Unexpected token in factor: {token.Type}");
+        throw new Exception($"Unexpected token in Evaluate Token: {token.Type}");
     }
 
     private void CheckToken(TokenType type)
