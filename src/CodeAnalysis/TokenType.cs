@@ -12,5 +12,8 @@ public enum TokenType
     Divide,
     
     OpenParenthesis,
-    CloseParenthesis
+    CloseParenthesis,
+    
+    Function,
+    Comma
 }
