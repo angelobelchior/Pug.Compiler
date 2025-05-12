@@ -1,24 +1,43 @@
-﻿using Pug.Compiler.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using Pug.Compiler.CodeAnalysis;
+using Pug.Compiler.Runtime;
+
+Dictionary<string, ExpressionResult> expressionResults = new();
 
 while (true)
 {
     try
     {
         Console.Write("> ");
-        var input = Console.ReadLine();
-        if (string.IsNullOrEmpty(input) || input.Equals(":q", StringComparison.CurrentCultureIgnoreCase))
+
+        var line = Console.ReadLine() ?? string.Empty;
+
+        if (line.Equals("/quit", StringComparison.CurrentCultureIgnoreCase))
+            return;
+
+        if (line.Equals("/cls", StringComparison.CurrentCultureIgnoreCase))
+        {
+            Console.Clear();
+            continue;
+        }
+
+        if (string.IsNullOrEmpty(line))
             break;
 
-        var lexer = new Lexer(input);
-        var tokens = lexer.CreateTokens();
+        var lexer = new Lexer(line);
+        var tokens = lexer.ExtractTokens();
 
-        var syntaxParser = new SyntaxParser(tokens);
+        var syntaxParser = new SyntaxParser(expressionResults, tokens);
         var result = syntaxParser.Parse();
 
-        Console.WriteLine(result);
+        if (result.DataType != DataTypes.Empty)
+            Console.WriteLine($": {result}");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"Erro: {ex.Message}");
     }
 }
+
+[ExcludeFromCodeCoverage]
+public partial class Program;

@@ -1,0 +1,69 @@
+using Pug.Compiler.CodeAnalysis;
+
+namespace Pug.Compiler.Runtime;
+
+public static class BuiltInFunctions
+{
+    private static readonly Dictionary<string, Func<List<ExpressionResult>, ExpressionResult>> _functions = new()
+    {
+        ["sqrt"] = args => args.Count == 1
+            ? ExpressionResult.Create(DataTypes.Double, Math.Sqrt(args[0].AsDouble()))
+            : throw new Exception("Invalid number of arguments for sqrt"),
+
+        ["pow"] = args => args.Count switch
+        {
+            1 => ExpressionResult.Create(DataTypes.Double, Math.Pow(args[0].AsDouble(), 2)),
+            2 => ExpressionResult.Create(DataTypes.Double, Math.Pow(args[0].AsDouble(), args[1].AsDouble())),
+            _ => throw new Exception("Invalid number of arguments for pow")
+        },
+
+        ["min"] = args => args.Count == 2
+            ? ExpressionResult.Create(DataTypes.Double, Math.Min(args[0].AsDouble(), args[1].AsDouble()))
+            : throw new Exception("Invalid number of arguments for min"),
+
+        ["max"] = args => args.Count == 2
+            ? ExpressionResult.Create(DataTypes.Double, Math.Max(args[0].AsDouble(), args[1].AsDouble()))
+            : throw new Exception("Invalid number of arguments for max"),
+
+        ["round"] = args => args.Count switch
+        {
+            1 => ExpressionResult.Create(DataTypes.Double, Math.Round(args[0].AsDouble())),
+            2 => ExpressionResult.Create(DataTypes.Double, Math.Round(args[0].AsDouble(), args[1].AsInt())),
+            _ => throw new Exception("Invalid number of arguments for round")
+        },
+
+        ["random"] = args => args.Count switch
+        {
+            0 => ExpressionResult.Create(DataTypes.Double, Random.Shared.NextDouble()),
+            1 => ExpressionResult.Create(DataTypes.Double, Random.Shared.Next(args[0].AsInt())),
+            2 => ExpressionResult.Create(DataTypes.Double, Random.Shared.Next(args[0].AsInt(), args[1].AsInt())),
+            _ => throw new Exception("Invalid number of arguments for random")
+        },
+
+        ["len"] = args => args.Count == 1
+            ? ExpressionResult.Create(DataTypes.Int, args[0].AsString().Length)
+            : throw new Exception("Invalid number of arguments for len"),
+
+        ["print"] = args =>
+        {
+            if (args.Count != 1)
+                throw new Exception("Invalid number of arguments for print");
+
+            Console.WriteLine(args[0].AsString());
+
+            return ExpressionResult.Create();
+        }
+    };
+
+    public static bool Contains(string functionName)
+        => _functions.ContainsKey(functionName);
+
+    public static ExpressionResult Invoke(Token token, List<ExpressionResult> args)
+    {
+        var result = _functions.TryGetValue(token.Value, out var function)
+            ? function(args)
+            : throw new Exception($"Function {token.Value} not found");
+
+        return result;
+    }
+}
