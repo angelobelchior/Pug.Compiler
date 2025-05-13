@@ -4,62 +4,62 @@ namespace Pug.Compiler.Runtime;
 
 public static class BuiltInFunctions
 {
-    private static readonly Dictionary<string, Func<List<ExpressionResult>, ExpressionResult>> _functions = new()
+    private static readonly Dictionary<string, Func<List<Identifier>, Identifier>> _functions = new()
     {
         ["sqrt"] = args => args.Count == 1
-            ? ExpressionResult.Create(DataTypes.Double, Math.Sqrt(args[0].AsDouble()))
+            ? Identifier.Create(DataTypes.Double, Math.Sqrt(args[0].AsDouble()))
             : throw new Exception("Invalid number of arguments for sqrt"),
 
         ["pow"] = args => args.Count switch
         {
-            1 => ExpressionResult.Create(DataTypes.Double, Math.Pow(args[0].AsDouble(), 2)),
-            2 => ExpressionResult.Create(DataTypes.Double, Math.Pow(args[0].AsDouble(), args[1].AsDouble())),
+            1 => Identifier.Create(DataTypes.Double, Math.Pow(args[0].AsDouble(), 2)),
+            2 => Identifier.Create(DataTypes.Double, Math.Pow(args[0].AsDouble(), args[1].AsDouble())),
             _ => throw new Exception("Invalid number of arguments for pow")
         },
 
         ["min"] = args => args.Count == 2
-            ? ExpressionResult.Create(DataTypes.Double, Math.Min(args[0].AsDouble(), args[1].AsDouble()))
+            ? Identifier.Create(DataTypes.Double, Math.Min(args[0].AsDouble(), args[1].AsDouble()))
             : throw new Exception("Invalid number of arguments for min"),
 
         ["max"] = args => args.Count == 2
-            ? ExpressionResult.Create(DataTypes.Double, Math.Max(args[0].AsDouble(), args[1].AsDouble()))
+            ? Identifier.Create(DataTypes.Double, Math.Max(args[0].AsDouble(), args[1].AsDouble()))
             : throw new Exception("Invalid number of arguments for max"),
 
         ["round"] = args => args.Count switch
         {
-            1 => ExpressionResult.Create(DataTypes.Double, Math.Round(args[0].AsDouble())),
-            2 => ExpressionResult.Create(DataTypes.Double, Math.Round(args[0].AsDouble(), args[1].AsInt())),
+            1 => Identifier.Create(DataTypes.Double, Math.Round(args[0].AsDouble())),
+            2 => Identifier.Create(DataTypes.Double, Math.Round(args[0].AsDouble(), args[1].AsInt())),
             _ => throw new Exception("Invalid number of arguments for round")
         },
 
         ["random"] = args => args.Count switch
         {
-            0 => ExpressionResult.Create(DataTypes.Double, Random.Shared.NextDouble()),
-            1 => ExpressionResult.Create(DataTypes.Double, Random.Shared.Next(args[0].AsInt())),
-            2 => ExpressionResult.Create(DataTypes.Double, Random.Shared.Next(args[0].AsInt(), args[1].AsInt())),
+            0 => Identifier.Create(DataTypes.Double, Random.Shared.NextDouble()),
+            1 => Identifier.Create(DataTypes.Double, Random.Shared.Next(args[0].AsInt())),
+            2 => Identifier.Create(DataTypes.Double, Random.Shared.Next(args[0].AsInt(), args[1].AsInt())),
             _ => throw new Exception("Invalid number of arguments for random")
         },
         
         ["upper"] = args => args.Count == 1
-            ? ExpressionResult.Create(DataTypes.Int, args[0].AsString().ToUpperInvariant())
+            ? Identifier.Create(DataTypes.Int, args[0].AsString().ToUpperInvariant())
             : throw new Exception("Invalid number of arguments for upper"),
         
         ["lower"] = args => args.Count == 1
-            ? ExpressionResult.Create(DataTypes.Int, args[0].AsString().ToLowerInvariant())
+            ? Identifier.Create(DataTypes.Int, args[0].AsString().ToLowerInvariant())
             : throw new Exception("Invalid number of arguments for lower"),
 
         ["len"] = args => args.Count == 1
-            ? ExpressionResult.Create(DataTypes.Int, args[0].AsString().Length)
+            ? Identifier.Create(DataTypes.Int, args[0].AsString().Length)
             : throw new Exception("Invalid number of arguments for len"),
         
         ["replace"] = args => args.Count == 3
-            ? ExpressionResult.Create(DataTypes.String, args[0].AsString().Replace(args[1].AsString(), args[2].AsString()))
+            ? Identifier.Create(DataTypes.String, args[0].AsString().Replace(args[1].AsString(), args[2].AsString()))
             : throw new Exception("Invalid number of arguments for replace"),
         
         ["substr"] = args => args.Count switch
         {
-            2 => ExpressionResult.Create(DataTypes.String, args[0].AsString().Substring(args[1].AsInt())),
-            3 => ExpressionResult.Create(DataTypes.String, args[0].AsString().Substring(args[1].AsInt(), args[2].AsInt())),
+            2 => Identifier.Create(DataTypes.String, args[0].AsString().Substring(args[1].AsInt())),
+            3 => Identifier.Create(DataTypes.String, args[0].AsString().Substring(args[1].AsInt(), args[2].AsInt())),
             _ => throw new Exception("Invalid number of arguments for substr")
         },
 
@@ -70,14 +70,14 @@ public static class BuiltInFunctions
 
             Console.WriteLine(args[0].AsString());
 
-            return ExpressionResult.Create();
+            return Identifier.Create();
         }
     };
 
     public static bool Contains(string functionName)
         => _functions.ContainsKey(functionName);
 
-    public static ExpressionResult Invoke(Token token, List<ExpressionResult> args)
+    public static Identifier Invoke(Token token, List<Identifier> args)
     {
         var result = _functions.TryGetValue(token.Value, out var function)
             ? function(args)

@@ -11,7 +11,7 @@ namespace Pug.Compiler.Tests;
 [Collection(nameof(SharedCollection))]
 public class GeneralTests(SharedValue sharedValue)
 {
-    private readonly Dictionary<string, ExpressionResult> _expressionResults = sharedValue.Results;
+    private readonly Dictionary<string, Identifier> _expressionResults = sharedValue.Results;
 
     [Theory]
     [InlineData(1, "int x = 5", "5")]
@@ -39,6 +39,14 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(23, "int erroLen = len(123)", "3")]
     [InlineData(24, "double parenteses = (5 + 3) * (2 - 1)", "8")]
     [InlineData(25, "double nested = ((10 + 5) * 2) / (3 + 2)", "6")]
+    [InlineData(26, "double a", "0")]
+    [InlineData(27, "int b", "0")]
+    [InlineData(28, "string c", "")]
+    [InlineData(29, "bool d", "false")]
+    [InlineData(30, "int idade", "0")]
+    [InlineData(31, "idade = idade + 1", "1")]
+    [InlineData(32, "string nome = \"Angelo\"", "Angelo")]
+    [InlineData(33, "nome = nome + \" Belchior\"", "Angelo Belchior")]
     public void Must_Parse_Expressions(
 #pragma warning disable xUnit1026
         int order,
@@ -76,14 +84,20 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("len()", "Invalid number of arguments for len")]
     [InlineData("len(1,2,3)", "Invalid number of arguments for len")]
     [InlineData("print(1,2,3)", "Invalid number of arguments for print")]
-    [InlineData("xpto(abc)", $"Unknown identifier: xpto")]
+    [InlineData("xpto(abc)", "Unknown identifier: xpto")]
+    [InlineData("int x = false", "Invalid type bool. Expected a int")]
+    [InlineData("int x = \"abcd\"", "Invalid type string. Expected a int")]
+    [InlineData("double x = false", "Invalid type bool. Expected a double")]
+    [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
+    [InlineData("bool x = 12234", "Invalid type number. Expected a bool")]
+    [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
         string exceptionMessage)
     {
         var exception = Assert.Throws<Exception>(() =>
         {
-            var results = new Dictionary<string, ExpressionResult>();
+            var results = new Dictionary<string, Identifier>();
             var lexer = new Lexer(expression);
             var tokens = lexer.ExtractTokens();
 
@@ -99,7 +113,7 @@ public class GeneralTests(SharedValue sharedValue)
     {
         var exception = Assert.Throws<Exception>(() =>
         {
-            var results = new Dictionary<string, ExpressionResult>();
+            var results = new Dictionary<string, Identifier>();
             var lexer = new Lexer("int idade = 10");
             var tokens = lexer.ExtractTokens();
 
@@ -134,7 +148,7 @@ public class InlineDataOrderer : ITestCaseOrderer
 
 public class SharedValue
 {
-    public Dictionary<string, ExpressionResult> Results { get; } = new();
+    public Dictionary<string, Identifier> Results { get; } = new();
 };
 
 [CollectionDefinition(nameof(SharedCollection))]

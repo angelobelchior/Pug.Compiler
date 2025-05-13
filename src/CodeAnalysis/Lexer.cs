@@ -72,7 +72,7 @@ public class Lexer
         var position = _currentPosition;
         var identifier = ExtractIdentifier();
 
-        if (ExpressionResult.ContainsDataType(identifier.Value))
+        if (Identifier.ContainsDataType(identifier.Value))
             return Token.DataType(position, identifier.Value);
 
         if (BuiltInFunctions.Contains(identifier.Value))
@@ -87,7 +87,7 @@ public class Lexer
     private Token ExtractString()
     {
         var position = _currentPosition;
-        
+
         Next();
         var stringValue = new StringBuilder();
 
@@ -122,7 +122,7 @@ public class Lexer
         Next();
         return token;
     }
-    
+
     private Token ExtractNumber()
     {
         var position = _currentPosition;

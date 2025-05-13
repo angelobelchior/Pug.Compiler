@@ -5,12 +5,12 @@ using Pug.Compiler.Runtime;
 namespace Pug.Compiler.Tests.Runtime;
 
 [ExcludeFromCodeCoverage]
-public class ExpressionResultTests
+public class IdentifierTests
 {
     [Fact]
     public void Create_ShouldReturnResultWithCorrectTypeAndValue()
     {
-        var result = ExpressionResult.Create(DataTypes.Int, 42);
+        var result = Identifier.Create(DataTypes.Int, 42);
 
         Assert.Equal(DataTypes.Int, result.DataType);
         Assert.Equal(42, result.Value);
@@ -21,7 +21,7 @@ public class ExpressionResultTests
     [InlineData(42)]
     public void Create_WithIntValue_ShouldReturnIntResult(object value)
     {
-        var result = ExpressionResult.Create(DataTypes.Int, value);
+        var result = Identifier.Create(DataTypes.Int, value);
 
         Assert.Equal(DataTypes.Int, result.DataType);
         Assert.Equal(42, result.AsInt());
@@ -32,7 +32,7 @@ public class ExpressionResultTests
     [InlineData("")]
     public void Create_WithInvalidValueInt_ShouldThrowException(object value)
     {
-        var result = ExpressionResult.Create(DataTypes.Int, value);
+        var result = Identifier.Create(DataTypes.Int, value);
         Assert.Throws<Exception>(() => result.AsInt());
     }
 
@@ -41,7 +41,7 @@ public class ExpressionResultTests
     [InlineData(42.5)]
     public void Create_WithDoubleValue_ShouldReturnDoubleResult(object value)
     {
-        var result = ExpressionResult.Create(DataTypes.Double, value);
+        var result = Identifier.Create(DataTypes.Double, value);
 
         Assert.Equal(DataTypes.Double, result.DataType);
         Assert.Equal(42.5, result.AsDouble());
@@ -52,7 +52,7 @@ public class ExpressionResultTests
     [InlineData("")]
     public void Create_WithInvalidValueDouble_ShouldThrowException(object value)
     {
-        var result = ExpressionResult.Create(DataTypes.Double, value);
+        var result = Identifier.Create(DataTypes.Double, value);
         Assert.Throws<Exception>(() => result.AsDouble());
     }
 
@@ -62,7 +62,7 @@ public class ExpressionResultTests
     [InlineData(true)]
     public void Create_WithBoolValueTrue_ShouldReturnBoolResult(object value)
     {
-        var result = ExpressionResult.Create(DataTypes.Bool, value);
+        var result = Identifier.Create(DataTypes.Bool, value);
 
         Assert.Equal(DataTypes.Bool, result.DataType);
         Assert.True(result.AsBool());
@@ -74,7 +74,7 @@ public class ExpressionResultTests
     [InlineData(false)]
     public void Create_WithBoolValueFalse_ShouldReturnBoolResulte(object value)
     {
-        var result = ExpressionResult.Create(DataTypes.Bool, value);
+        var result = Identifier.Create(DataTypes.Bool, value);
 
         Assert.Equal(DataTypes.Bool, result.DataType);
         Assert.False(result.AsBool());
@@ -85,14 +85,14 @@ public class ExpressionResultTests
     [InlineData("")]
     public void Create_WithInvalidValueBoolean_ShouldThrowException(object value)
     {
-        var result = ExpressionResult.Create(DataTypes.Bool, value);
+        var result = Identifier.Create(DataTypes.Bool, value);
         Assert.Throws<Exception>(() => result.AsBool());
     }
 
     [Fact]
     public void Create_WithStringValue_ShouldReturnStringResult()
     {
-        var resul = ExpressionResult.Create(DataTypes.String, "test");
+        var resul = Identifier.Create(DataTypes.String, "test");
 
         Assert.Equal(DataTypes.String, resul.DataType);
         Assert.Equal("test", resul.Value);
@@ -101,17 +101,17 @@ public class ExpressionResultTests
     [Fact]
     public void Create_WithoutParameters_ShouldReturnVoidResult()
     {
-        var result = ExpressionResult.Create();
+        var result = Identifier.Create();
 
-        Assert.Equal(DataTypes.Empty, result.DataType);
-        Assert.Equal(ExpressionResultVoid.Void, result.Value);
+        Assert.Equal(DataTypes.None, result.DataType);
+        Assert.Equal(None.Value, result.Value);
     }
 
     [Fact]
     public void FromToken_ShouldReturnResultWithCorrectTypeAndValue()
     {
         var token = Token.Number(1, "42");
-        var result = ExpressionResult.FromToken(token);
+        var result = Identifier.FromToken(token);
 
         Assert.Equal(DataTypes.Double, result.DataType);
         Assert.Equal("42", result.Value.ToString());
@@ -122,7 +122,7 @@ public class ExpressionResultTests
     {
         var token = Token.Number(1, "42.5");
 
-        var result = ExpressionResult.FromToken(token);
+        var result = Identifier.FromToken(token);
 
         Assert.Equal(DataTypes.Double, result.DataType);
         Assert.Equal("42.5", result.Value);
@@ -133,7 +133,7 @@ public class ExpressionResultTests
     {
         var token = Token.Bool(2, "true");
 
-        var result = ExpressionResult.FromToken(token);
+        var result = Identifier.FromToken(token);
 
         Assert.Equal(DataTypes.Bool, result.DataType);
         Assert.Equal("true", result.Value);
@@ -144,7 +144,7 @@ public class ExpressionResultTests
     {
         var token = Token.String(3, "test");
 
-        var result = ExpressionResult.FromToken(token);
+        var result = Identifier.FromToken(token);
 
         Assert.Equal(DataTypes.String, result.DataType);
         Assert.Equal("test", result.Value);
@@ -155,7 +155,7 @@ public class ExpressionResultTests
     {
         var token = Token.Identifier(4, "variable");
 
-        var exception = Assert.Throws<Exception>(() => ExpressionResult.FromToken(token));
+        var exception = Assert.Throws<Exception>(() => Identifier.FromToken(token));
 
         Assert.Equal("Invalid token type: Identifier", exception.Message);
     }
@@ -163,18 +163,18 @@ public class ExpressionResultTests
     [Fact]
     public void Cast_ShouldConvertResultToSpecifiedType()
     {
-        var result = ExpressionResult.Create(DataTypes.Double, 42.5);
+        var result = Identifier.Create(DataTypes.Double, 42.5);
 
-        var castedValue = result.Cast("int");
+        var castedValue = result.Cast("double");
 
-        Assert.Equal(DataTypes.Int, castedValue.DataType);
-        Assert.Equal(42, castedValue.Value);
+        Assert.Equal(DataTypes.Double, castedValue.DataType);
+        Assert.Equal(42.5, castedValue.AsDouble());
     }
 
     [Fact]
     public void ToString_ShouldReturnCorrectStringRepresentation()
     {
-        var result = ExpressionResult.Create(DataTypes.Int, 42);
+        var result = Identifier.Create(DataTypes.Int, 42);
 
         Assert.Equal("42", result.Value.ToString());
     }
@@ -182,7 +182,7 @@ public class ExpressionResultTests
     [Fact]
     public void Cast_InvalidType_ShouldThrowException()
     {
-        var result = ExpressionResult.Create(DataTypes.Int, 42);
+        var result = Identifier.Create(DataTypes.Int, 42);
 
         Assert.Throws<Exception>(() => result.Cast("unknown"));
     }
@@ -196,7 +196,7 @@ public class ExpressionResultTests
     [InlineData("", false)]
     public void ContainDataType_ShouldReturnExpectedResult(string type, bool expected)
     {
-        var result = ExpressionResult.ContainsDataType(type);
+        var result = Identifier.ContainsDataType(type);
 
         Assert.Equal(expected, result);
     }

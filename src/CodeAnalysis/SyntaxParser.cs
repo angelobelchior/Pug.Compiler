@@ -2,12 +2,15 @@ using Pug.Compiler.Runtime;
 
 namespace Pug.Compiler.CodeAnalysis;
 
-public class SyntaxParser(Dictionary<string, ExpressionResult> expressionResults, List<Token> tokens)
+public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token> tokens)
 {
     private Token CurrentToken => tokens[_currentPosition];
     private int _currentPosition;
 
-    public ExpressionResult Parse()
+    public Identifier Parse()
+        => EvaluateExpression();
+
+    private Identifier EvaluateExpression()
     {
         var left = EvaluateExpressionWithPriority();
 
@@ -24,7 +27,7 @@ public class SyntaxParser(Dictionary<string, ExpressionResult> expressionResults
         return left;
     }
 
-    private ExpressionResult EvaluateExpressionWithPriority()
+    private Identifier EvaluateExpressionWithPriority()
     {
         var left = EvaluateToken();
 
@@ -37,19 +40,19 @@ public class SyntaxParser(Dictionary<string, ExpressionResult> expressionResults
                 ? left.AsDouble() * right.AsDouble()
                 : left.AsDouble() / right.AsDouble();
 
-            left = new ExpressionResult(DataTypes.Double, value);
+            left = new Identifier(DataTypes.Double, value);
         }
 
         return left;
     }
 
-    private ExpressionResult EvaluateToken()
+    private Identifier EvaluateToken()
         => CurrentToken.Type switch
         {
             TokenType.DataType => EvaluateDataTypeToken(),
             TokenType.Identifier => EvaluateIdentifierToken(),
             TokenType.Function => EvaluateFunctionToken(),
-            TokenType.Plus or TokenType.Minus => EvaluateUnaryOperation(),
+            TokenType.Plus or TokenType.Minus => EvaluateOperation(),
             TokenType.Number => EvaluateNumberToken(),
             TokenType.String => EvaluateStringToken(),
             TokenType.Bool => EvaluateBoolToken(),
@@ -57,49 +60,56 @@ public class SyntaxParser(Dictionary<string, ExpressionResult> expressionResults
             _ => throw new Exception($"Unexpected token in EvaluateToken: {CurrentToken.Type}")
         };
 
-    private ExpressionResult EvaluateDataTypeToken()
+    private Identifier EvaluateDataTypeToken()
     {
         var dataTypeToken = NextIfTokenIs(TokenType.DataType);
-        var variableName = NextIfTokenIs(TokenType.Identifier).Value;
-        NextIfTokenIs(TokenType.Assign);
-
-        var value = Parse();
-
-        if (!ExpressionResult.ContainsDataType(dataTypeToken.Value))
+        if (!Identifier.ContainsDataType(dataTypeToken.Value))
             throw new Exception($"Unknown type: {dataTypeToken.Value}");
 
-        var typedValue = value.Cast(dataTypeToken.Value);
-        expressionResults[variableName] = typedValue;
+        var checkNext = Peek();
 
-        return typedValue;
+        var name = NextIfTokenIs(TokenType.Identifier).Value;
+        var identifier = Identifier.Default(dataTypeToken.Value);
+        identifiers[name] = identifier;
+
+        if (checkNext.Type != TokenType.Assign)
+            return identifier;
+
+        NextIfTokenIs(TokenType.Assign);
+        var value = EvaluateExpression();
+        identifier = value.Cast(dataTypeToken.Value);
+
+        identifiers[name] = identifier;
+        return identifier;
     }
 
-    private ExpressionResult EvaluateIdentifierToken()
+    private Identifier EvaluateIdentifierToken()
     {
-        if (CurrentToken.Type == TokenType.Identifier && Peek().Type == TokenType.Assign)
+        var checkNext = Peek();
+        if (CurrentToken.Type == TokenType.Identifier && checkNext.Type == TokenType.Assign)
             return EvaluateAssignment();
 
         var token = NextIfTokenIs(TokenType.Identifier);
 
-        if (!expressionResults.TryGetValue(token.Value, out var identifier))
+        if (!identifiers.TryGetValue(token.Value, out var identifier))
             throw new Exception($"Unknown identifier: {token.Value}");
 
         return identifier;
     }
 
-    private ExpressionResult EvaluateFunctionToken()
+    private Identifier EvaluateFunctionToken()
     {
         var token = NextIfTokenIs(TokenType.Function);
         NextIfTokenIs(TokenType.OpenParenthesis);
 
-        var args = new List<ExpressionResult>();
+        var args = new List<Identifier>();
         if (CurrentToken.Type != TokenType.CloseParenthesis)
         {
-            args.Add(Parse());
+            args.Add(EvaluateExpression());
             while (CurrentToken.Type == TokenType.Comma)
             {
                 NextIfTokenIs(TokenType.Comma);
-                args.Add(Parse());
+                args.Add(EvaluateExpression());
             }
         }
 
@@ -107,36 +117,36 @@ public class SyntaxParser(Dictionary<string, ExpressionResult> expressionResults
         return BuiltInFunctions.Invoke(token, args);
     }
 
-    private ExpressionResult EvaluateUnaryOperation()
+    private Identifier EvaluateOperation()
     {
         var token = NextIfTokenIs(CurrentToken.Type);
         var result = EvaluateToken();
         var value = token.Type == TokenType.Minus ? -result.AsDouble() : result.AsDouble();
-        return new ExpressionResult(DataTypes.Double, value);
+        return new Identifier(DataTypes.Double, value);
     }
 
-    private ExpressionResult EvaluateNumberToken()
+    private Identifier EvaluateNumberToken()
     {
         var token = NextIfTokenIs(TokenType.Number);
-        return ExpressionResult.FromToken(token);
+        return Identifier.FromToken(token);
     }
 
-    private ExpressionResult EvaluateStringToken()
+    private Identifier EvaluateStringToken()
     {
         var token = NextIfTokenIs(TokenType.String);
-        return new ExpressionResult(DataTypes.String, token.Value);
+        return new Identifier(DataTypes.String, token.Value);
     }
 
-    private ExpressionResult EvaluateBoolToken()
+    private Identifier EvaluateBoolToken()
     {
         var token = NextIfTokenIs(TokenType.Bool);
-        return new ExpressionResult(DataTypes.Bool, token.Value);
+        return new Identifier(DataTypes.Bool, token.Value);
     }
 
-    private ExpressionResult EvaluateParenthesizedExpression()
+    private Identifier EvaluateParenthesizedExpression()
     {
         NextIfTokenIs(TokenType.OpenParenthesis);
-        var result = Parse();
+        var result = EvaluateExpression();
         NextIfTokenIs(TokenType.CloseParenthesis);
         return result;
     }
@@ -151,34 +161,34 @@ public class SyntaxParser(Dictionary<string, ExpressionResult> expressionResults
         return token;
     }
 
-    private static ExpressionResult EvaluateStringOperation(ExpressionResult left, ExpressionResult right,
+    private static Identifier EvaluateStringOperation(Identifier left, Identifier right,
         Token @operator)
     {
         return @operator.Type == TokenType.Plus
-            ? new ExpressionResult(DataTypes.String, left.AsString() + right.AsString())
-            : new ExpressionResult(DataTypes.String, left.AsString().Replace(right.AsString(), string.Empty));
+            ? new Identifier(DataTypes.String, left.AsString() + right.AsString())
+            : new Identifier(DataTypes.String, left.AsString().Replace(right.AsString(), string.Empty));
     }
 
-    private static ExpressionResult EvaluateNumberOperation(ExpressionResult left, ExpressionResult right,
+    private static Identifier EvaluateNumberOperation(Identifier left, Identifier right,
         Token @operator)
     {
         var value = @operator.Type == TokenType.Plus
             ? left.AsDouble() + right.AsDouble()
             : left.AsDouble() - right.AsDouble();
 
-        return new ExpressionResult(DataTypes.Double, value);
+        return new Identifier(DataTypes.Double, value);
     }
 
-    private ExpressionResult EvaluateAssignment()
+    private Identifier EvaluateAssignment()
     {
         var variableName = NextIfTokenIs(TokenType.Identifier).Value;
         NextIfTokenIs(TokenType.Assign);
-        var value = Parse();
+        var value = EvaluateExpression();
 
-        if (!expressionResults.ContainsKey(variableName))
+        if (!identifiers.ContainsKey(variableName))
             throw new Exception($"Unknown identifier: {variableName}");
 
-        expressionResults[variableName] = value;
+        identifiers[variableName] = value;
         return value;
     }
 

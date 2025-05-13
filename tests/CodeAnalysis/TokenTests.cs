@@ -27,12 +27,22 @@ public class TokenTests
     }
 
     [Fact]
-    public void Number_ShouldCreateNumberToken()
+    public void Number_ShouldCreateIntToken()
     {
         var token = Token.Number(2, "42");
 
         Assert.Equal(TokenType.Number, token.Type);
         Assert.Equal("42", token.Value);
+        Assert.Equal(2, token.Position);
+    }
+    
+    [Fact]
+    public void Number_ShouldCreateDoubleToken()
+    {
+        var token = Token.Number(2, "42.22");
+
+        Assert.Equal(TokenType.Number, token.Type);
+        Assert.Equal("42.22", token.Value);
         Assert.Equal(2, token.Position);
     }
 

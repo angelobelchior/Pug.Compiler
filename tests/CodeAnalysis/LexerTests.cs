@@ -9,7 +9,7 @@ public class LexerTests
     [Fact]
     public void ExtractTokens_ShouldExtractTokens()
     {
-        var lexer = new Lexer("42 true false \"olá mundo\" + - * / = ( ) pow , int x -84");
+        var lexer = new Lexer("42 true false \"olá mundo\" + - * / = ( ) pow , int x -84.25");
         var tokens = lexer.ExtractTokens();
 
         Assert.Equal(17, tokens.Count); 
@@ -76,10 +76,10 @@ public class LexerTests
         
         Assert.Equal(TokenType.Number, tokens[15].Type);
         Assert.Equal(52, tokens[15].Position);
-        Assert.Equal("-84", tokens[15].Value);
+        Assert.Equal("-84.25", tokens[15].Value);
         
         Assert.Equal(TokenType.EndOfFile, tokens[16].Type);
-        Assert.Equal(55, tokens[16].Position);
+        Assert.Equal(58, tokens[16].Position);
     }
     
     [Fact]

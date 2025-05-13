@@ -2,16 +2,18 @@
 using Pug.Compiler.CodeAnalysis;
 using Pug.Compiler.Runtime;
 
-Dictionary<string, ExpressionResult> expressionResults = new();
+Dictionary<string, Identifier> identifiers = new();
 
 while (true)
 {
     try
     {
+        Console.ForegroundColor = ConsoleColor.Green;
         Console.Write("> ");
 
         var line = Console.ReadLine() ?? string.Empty;
-
+        Console.ResetColor();
+        
         if (line.Equals("/quit", StringComparison.CurrentCultureIgnoreCase))
             return;
 
@@ -27,22 +29,21 @@ while (true)
         var lexer = new Lexer(line);
         var tokens = lexer.ExtractTokens();
 
-        var syntaxParser = new SyntaxParser(expressionResults, tokens);
+        var syntaxParser = new SyntaxParser(identifiers, tokens);
         var result = syntaxParser.Parse();
 
-        if (result.DataType != DataTypes.Empty)
-            Print(":", result.Value, ConsoleColor.Blue);
+        if (result.DataType != DataTypes.None)
+            WriteLine(result.Value, ConsoleColor.Blue);
     }
     catch (Exception ex)
     {
-        Print("x", ex.Message, ConsoleColor.Red);
+        WriteLine(ex.Message, ConsoleColor.Red);
     }
 }
 
-static void Print(string prefix, object message, ConsoleColor color)
+static void WriteLine(object message, ConsoleColor color)
 {
     Console.ForegroundColor = color;
-    Console.Write($"{prefix} ");
     Console.WriteLine(message);
     Console.ResetColor();
 }

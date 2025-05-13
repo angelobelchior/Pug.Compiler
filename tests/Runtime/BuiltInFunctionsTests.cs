@@ -30,7 +30,7 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenFunctionNotFound()
     {
         var token = Token.Function(0, "nonexistent");
-        var args = new List<ExpressionResult>();
+        var args = new List<Identifier>();
 
         var exception = Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
         Assert.Equal("Function nonexistent not found", exception.Message);
@@ -40,7 +40,7 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteSqrtFunction()
     {
         var token = Token.Function(0, "sqrt");
-        var args = new List<ExpressionResult> { ExpressionResult.Create(DataTypes.Double, 16.0) };
+        var args = new List<Identifier> { Identifier.Create(DataTypes.Double, 16.0) };
 
         var result = BuiltInFunctions.Invoke(token, args);
 
@@ -52,7 +52,7 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenInvalidArgumentsForSqrt()
     {
         var token = Token.Function(0, "sqrt");
-        var args = new List<ExpressionResult>();
+        var args = new List<Identifier>();
 
         Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
     }
@@ -61,7 +61,7 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecutePowFunction_WithOneArgument()
     {
         var token = Token.Function(0, "pow");
-        var args = new List<ExpressionResult> { ExpressionResult.Create(DataTypes.Double, 3.0) };
+        var args = new List<Identifier> { Identifier.Create(DataTypes.Double, 3.0) };
 
         var result = BuiltInFunctions.Invoke(token, args);
 
@@ -73,10 +73,10 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecutePowFunction_WithTwoArguments()
     {
         var token = Token.Function(0, "pow");
-        var args = new List<ExpressionResult>
+        var args = new List<Identifier>
         {
-            ExpressionResult.Create(DataTypes.Double, 2.0),
-            ExpressionResult.Create(DataTypes.Double, 3.0)
+            Identifier.Create(DataTypes.Double, 2.0),
+            Identifier.Create(DataTypes.Double, 3.0)
         };
 
         var result = BuiltInFunctions.Invoke(token, args);
@@ -89,11 +89,11 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenInvalidArgumentsForPow()
     {
         var token = Token.Function(0, "pow");
-        List<ExpressionResult> args =
+        List<Identifier> args =
         [
-            ExpressionResult.Create(DataTypes.Double, 1),
-            ExpressionResult.Create(DataTypes.Double, 2),
-            ExpressionResult.Create(DataTypes.Double, 3),
+            Identifier.Create(DataTypes.Double, 1),
+            Identifier.Create(DataTypes.Double, 2),
+            Identifier.Create(DataTypes.Double, 3),
         ];
 
         Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
@@ -103,10 +103,10 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteMinFunction_WithTwoArguments()
     {
         var token = Token.Function(0, "min");
-        var args = new List<ExpressionResult>
+        var args = new List<Identifier>
         {
-            ExpressionResult.Create(DataTypes.Double, 2.0),
-            ExpressionResult.Create(DataTypes.Double, 3.0)
+            Identifier.Create(DataTypes.Double, 2.0),
+            Identifier.Create(DataTypes.Double, 3.0)
         };
 
         var result = BuiltInFunctions.Invoke(token, args);
@@ -119,11 +119,11 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenInvalidArgumentsForMin()
     {
         var token = Token.Function(0, "min");
-        List<ExpressionResult> args =
+        List<Identifier> args =
         [
-            ExpressionResult.Create(DataTypes.Double, 1),
-            ExpressionResult.Create(DataTypes.Double, 2),
-            ExpressionResult.Create(DataTypes.Double, 3),
+            Identifier.Create(DataTypes.Double, 1),
+            Identifier.Create(DataTypes.Double, 2),
+            Identifier.Create(DataTypes.Double, 3),
         ];
 
         Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
@@ -133,10 +133,10 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteMaxFunction_WithTwoArguments()
     {
         var token = Token.Function(0, "max");
-        var args = new List<ExpressionResult>
+        var args = new List<Identifier>
         {
-            ExpressionResult.Create(DataTypes.Double, 2.0),
-            ExpressionResult.Create(DataTypes.Double, 3.0)
+            Identifier.Create(DataTypes.Double, 2.0),
+            Identifier.Create(DataTypes.Double, 3.0)
         };
 
         var result = BuiltInFunctions.Invoke(token, args);
@@ -149,11 +149,11 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenInvalidArgumentsForMax()
     {
         var token = Token.Function(0, "max");
-        List<ExpressionResult> args =
+        List<Identifier> args =
         [
-            ExpressionResult.Create(DataTypes.Double, 1),
-            ExpressionResult.Create(DataTypes.Double, 2),
-            ExpressionResult.Create(DataTypes.Double, 3),
+            Identifier.Create(DataTypes.Double, 1),
+            Identifier.Create(DataTypes.Double, 2),
+            Identifier.Create(DataTypes.Double, 3),
         ];
 
         Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
@@ -163,7 +163,7 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteRoundFunction_WithOneArgument()
     {
         var token = Token.Function(0, "round");
-        var args = new List<ExpressionResult> { ExpressionResult.Create(DataTypes.Double, 3.53) };
+        var args = new List<Identifier> { Identifier.Create(DataTypes.Double, 3.53) };
 
         var result = BuiltInFunctions.Invoke(token, args);
 
@@ -175,10 +175,10 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteRoundFunction_WithTwoArguments()
     {
         var token = Token.Function(0, "round");
-        var args = new List<ExpressionResult>
+        var args = new List<Identifier>
         {
-            ExpressionResult.Create(DataTypes.Double, 3.534),
-            ExpressionResult.Create(DataTypes.Double, 2)
+            Identifier.Create(DataTypes.Double, 3.534),
+            Identifier.Create(DataTypes.Double, 2)
         };
 
         var result = BuiltInFunctions.Invoke(token, args);
@@ -191,11 +191,11 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenInvalidArgumentsForRound()
     {
         var token = Token.Function(0, "round");
-        List<ExpressionResult> args =
+        List<Identifier> args =
         [
-            ExpressionResult.Create(DataTypes.Double, 1),
-            ExpressionResult.Create(DataTypes.Double, 2),
-            ExpressionResult.Create(DataTypes.Double, 3),
+            Identifier.Create(DataTypes.Double, 1),
+            Identifier.Create(DataTypes.Double, 2),
+            Identifier.Create(DataTypes.Double, 3),
         ];
 
         Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
@@ -205,7 +205,7 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteRandomFunction_WithZeroArgument()
     {
         var token = Token.Function(0, "random");
-        var args = new List<ExpressionResult>();
+        var args = new List<Identifier>();
 
         var result = BuiltInFunctions.Invoke(token, args);
 
@@ -218,9 +218,9 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteRandomFunction_WithOneArgument()
     {
         var token = Token.Function(0, "random");
-        var args = new List<ExpressionResult>
+        var args = new List<Identifier>
         {
-            ExpressionResult.Create(DataTypes.Int, 2),
+            Identifier.Create(DataTypes.Int, 2),
         };
 
         var result = BuiltInFunctions.Invoke(token, args);
@@ -233,10 +233,10 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteRandomFunction_WithTwoArguments()
     {
         var token = Token.Function(0, "random");
-        var args = new List<ExpressionResult>
+        var args = new List<Identifier>
         {
-            ExpressionResult.Create(DataTypes.Int, 2),
-            ExpressionResult.Create(DataTypes.Int, 3)
+            Identifier.Create(DataTypes.Int, 2),
+            Identifier.Create(DataTypes.Int, 3)
         };
 
         var result = BuiltInFunctions.Invoke(token, args);
@@ -249,11 +249,11 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenInvalidArgumentsForRandom()
     {
         var token = Token.Function(0, "pow");
-        List<ExpressionResult> args =
+        List<Identifier> args =
         [
-            ExpressionResult.Create(DataTypes.Double, 1),
-            ExpressionResult.Create(DataTypes.Double, 2),
-            ExpressionResult.Create(DataTypes.Double, 3),
+            Identifier.Create(DataTypes.Double, 1),
+            Identifier.Create(DataTypes.Double, 2),
+            Identifier.Create(DataTypes.Double, 3),
         ];
 
         Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
@@ -263,9 +263,9 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecuteLenFunction_WithOneArguments()
     {
         var token = Token.Function(0, "len");
-        var args = new List<ExpressionResult>
+        var args = new List<Identifier>
         {
-            ExpressionResult.Create(DataTypes.String, "Angelo")
+            Identifier.Create(DataTypes.String, "Angelo")
         };
 
         var result = BuiltInFunctions.Invoke(token, args);
@@ -278,11 +278,11 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenInvalidArgumentsForLen()
     {
         var token = Token.Function(0, "len");
-        List<ExpressionResult> args =
+        List<Identifier> args =
         [
-            ExpressionResult.Create(DataTypes.Double, 1),
-            ExpressionResult.Create(DataTypes.Double, 2),
-            ExpressionResult.Create(DataTypes.Double, 3),
+            Identifier.Create(DataTypes.Double, 1),
+            Identifier.Create(DataTypes.Double, 2),
+            Identifier.Create(DataTypes.Double, 3),
         ];
 
         Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
@@ -292,7 +292,7 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldExecutePrintFunction()
     {
         var token = Token.Function(0, "print");
-        var args = new List<ExpressionResult> { ExpressionResult.Create(DataTypes.String, "Hello, World!") };
+        var args = new List<Identifier> { Identifier.Create(DataTypes.String, "Hello, World!") };
 
         var exception = Record.Exception(() => BuiltInFunctions.Invoke(token, args));
 
@@ -303,11 +303,11 @@ public class BuiltInFunctionsTests
     public void Invoke_ShouldThrowException_WhenInvalidArgumentsForPrint()
     {
         var token = Token.Function(0, "print");
-        List<ExpressionResult> args =
+        List<Identifier> args =
         [
-            ExpressionResult.Create(DataTypes.Double, 1),
-            ExpressionResult.Create(DataTypes.Double, 2),
-            ExpressionResult.Create(DataTypes.Double, 3),
+            Identifier.Create(DataTypes.Double, 1),
+            Identifier.Create(DataTypes.Double, 2),
+            Identifier.Create(DataTypes.Double, 3),
         ];
 
         Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));

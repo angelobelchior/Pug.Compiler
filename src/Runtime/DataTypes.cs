@@ -7,5 +7,5 @@ public enum DataTypes
     Bool,
     String,
 
-    Empty
+    None
 }
