@@ -76,8 +76,10 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("len()", "Invalid number of arguments for len")]
     [InlineData("len(1,2,3)", "Invalid number of arguments for len")]
     [InlineData("print(1,2,3)", "Invalid number of arguments for print")]
-    [InlineData("xpto(abc)", "Variable or Function 'xpto' not declared")]
-    public void Invalid_Functions_Must_Throw_Exception(string expression, string exceptionMessage)
+    [InlineData("xpto(abc)", $"Unknown identifier: xpto")]
+    public void Invalid_Functions_Must_Throw_Exception(
+        string expression,
+        string exceptionMessage)
     {
         var exception = Assert.Throws<Exception>(() =>
         {
@@ -91,13 +93,43 @@ public class GeneralTests(SharedValue sharedValue)
 
         Assert.Equal(exceptionMessage, exception.Message);
     }
+
+    [Fact]
+    public void Must_Throw_Exception_When_FunctionOrVariable_Not_Declared()
+    {
+        var exception = Assert.Throws<Exception>(() =>
+        {
+            var results = new Dictionary<string, ExpressionResult>();
+            var lexer = new Lexer("int idade = 10");
+            var tokens = lexer.ExtractTokens();
+
+            var syntaxParser = new SyntaxParser(results, tokens);
+            var result = syntaxParser.Parse();
+
+            Assert.Equal(10, result.Value);
+
+            lexer = new Lexer("idade = y");
+            tokens = lexer.ExtractTokens();
+
+            syntaxParser = new SyntaxParser(results, tokens);
+            _ = syntaxParser.Parse();
+        });
+
+        Assert.Equal($"Unknown identifier: y", exception.Message);
+    }
 }
 
 public class InlineDataOrderer : ITestCaseOrderer
 {
     public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases)
         where TTestCase : ITestCase
-        => testCases.OrderBy(tc => int.TryParse(tc.TestMethodArguments[0].ToString(), out var number) ? number : 0);
+        => testCases.OrderBy(tc =>
+        {
+            if (tc.TestMethodArguments is not null && tc.TestMethodArguments.Length > 0)
+                return int.TryParse(tc.TestMethodArguments[0].ToString(), out var number) ? number : 0;
+
+            return 0;
+        });
 }
 
 public class SharedValue

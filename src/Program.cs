@@ -31,12 +31,20 @@ while (true)
         var result = syntaxParser.Parse();
 
         if (result.DataType != DataTypes.Empty)
-            Console.WriteLine($": {result}");
+            Print(":", result.Value, ConsoleColor.Blue);
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Erro: {ex.Message}");
+        Print("x", ex.Message, ConsoleColor.Red);
     }
+}
+
+static void Print(string prefix, object message, ConsoleColor color)
+{
+    Console.ForegroundColor = color;
+    Console.Write($"{prefix} ");
+    Console.WriteLine(message);
+    Console.ResetColor();
 }
 
 [ExcludeFromCodeCoverage]

@@ -39,10 +39,29 @@ public static class BuiltInFunctions
             2 => ExpressionResult.Create(DataTypes.Double, Random.Shared.Next(args[0].AsInt(), args[1].AsInt())),
             _ => throw new Exception("Invalid number of arguments for random")
         },
+        
+        ["upper"] = args => args.Count == 1
+            ? ExpressionResult.Create(DataTypes.Int, args[0].AsString().ToUpperInvariant())
+            : throw new Exception("Invalid number of arguments for upper"),
+        
+        ["lower"] = args => args.Count == 1
+            ? ExpressionResult.Create(DataTypes.Int, args[0].AsString().ToLowerInvariant())
+            : throw new Exception("Invalid number of arguments for lower"),
 
         ["len"] = args => args.Count == 1
             ? ExpressionResult.Create(DataTypes.Int, args[0].AsString().Length)
             : throw new Exception("Invalid number of arguments for len"),
+        
+        ["replace"] = args => args.Count == 3
+            ? ExpressionResult.Create(DataTypes.String, args[0].AsString().Replace(args[1].AsString(), args[2].AsString()))
+            : throw new Exception("Invalid number of arguments for replace"),
+        
+        ["substr"] = args => args.Count switch
+        {
+            2 => ExpressionResult.Create(DataTypes.String, args[0].AsString().Substring(args[1].AsInt())),
+            3 => ExpressionResult.Create(DataTypes.String, args[0].AsString().Substring(args[1].AsInt(), args[2].AsInt())),
+            _ => throw new Exception("Invalid number of arguments for substr")
+        },
 
         ["print"] = args =>
         {
