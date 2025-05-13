@@ -60,7 +60,7 @@ public class GeneralTests(SharedValue sharedValue)
         var tokens = lexer.ExtractTokens();
 
         var syntaxParser = new SyntaxParser(_expressionResults, tokens);
-        var result = syntaxParser.Parse();
+        var result = syntaxParser.Evaluate();
 
         Assert.Equal(expectedResult, result.Value.ToString());
     }
@@ -110,7 +110,7 @@ public class GeneralTests(SharedValue sharedValue)
             var tokens = lexer.ExtractTokens();
 
             var syntaxParser = new SyntaxParser(results, tokens);
-            _ = syntaxParser.Parse();
+            _ = syntaxParser.Evaluate();
         });
 
         Assert.Equal(exceptionMessage, exception.Message);
@@ -126,7 +126,7 @@ public class GeneralTests(SharedValue sharedValue)
             var tokens = lexer.ExtractTokens();
 
             var syntaxParser = new SyntaxParser(results, tokens);
-            var result = syntaxParser.Parse();
+            var result = syntaxParser.Evaluate();
 
             Assert.Equal(10, result.Value);
 
@@ -134,7 +134,7 @@ public class GeneralTests(SharedValue sharedValue)
             tokens = lexer.ExtractTokens();
 
             syntaxParser = new SyntaxParser(results, tokens);
-            _ = syntaxParser.Parse();
+            _ = syntaxParser.Evaluate();
         });
 
         Assert.Equal($"Unknown identifier: y", exception.Message);

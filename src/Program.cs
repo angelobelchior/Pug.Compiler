@@ -30,7 +30,7 @@ while (true)
         var tokens = lexer.ExtractTokens();
 
         var syntaxParser = new SyntaxParser(identifiers, tokens);
-        var result = syntaxParser.Parse();
+        var result = syntaxParser.Evaluate();
 
         if (result.DataType != DataTypes.None)
             WriteLine(result.Value, ConsoleColor.Blue);

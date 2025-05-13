@@ -8,7 +8,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     private Token CurrentToken => tokens[_currentPosition];
     private int _currentPosition;
 
-    public Identifier Parse()
+    public Identifier Evaluate()
         => EvaluateExpression();
 
     private Identifier EvaluateExpression()
@@ -43,18 +43,18 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     private Identifier EvaluateToken()
         => CurrentToken.Type switch
         {
-            TokenType.DataType => EvaluateDataTypeToken(),
-            TokenType.Identifier => EvaluateIdentifierToken(),
-            TokenType.Function => EvaluateFunctionToken(),
+            TokenType.DataType => EvaluateDataType(),
+            TokenType.Identifier => EvaluateIdentifier(),
+            TokenType.Function => EvaluateFunction(),
             TokenType.Plus or TokenType.Minus => EvaluateSignal(),
-            TokenType.Number => EvaluateNumberToken(),
-            TokenType.String => EvaluateStringToken(),
-            TokenType.Bool => EvaluateBoolToken(),
-            TokenType.OpenParenthesis => EvaluateParenthesizedExpression(),
+            TokenType.Number => EvaluateNumber(),
+            TokenType.String => EvaluateString(),
+            TokenType.Bool => EvaluateBool(),
+            TokenType.OpenParenthesis => EvaluateParenthesis(),
             _ => throw new Exception($"Unexpected token in EvaluateToken: {CurrentToken.Type}")
         };
 
-    private Identifier EvaluateDataTypeToken()
+    private Identifier EvaluateDataType()
     {
         var dataTypeToken = NextIfTokenIs(TokenType.DataType);
         if (!Identifier.ContainsDataType(dataTypeToken.Value))
@@ -77,7 +77,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         return identifier;
     }
 
-    private Identifier EvaluateIdentifierToken()
+    private Identifier EvaluateIdentifier()
     {
         var checkNext = Peek();
         if (CurrentToken.Type == TokenType.Identifier && checkNext.Type == TokenType.Assign)
@@ -91,7 +91,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         return identifier;
     }
 
-    private Identifier EvaluateFunctionToken()
+    private Identifier EvaluateFunction()
     {
         var token = NextIfTokenIs(TokenType.Function);
         NextIfTokenIs(TokenType.OpenParenthesis);
@@ -115,44 +115,37 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     {
         var token = NextIfTokenIs(CurrentToken.Type);
         var result = EvaluateToken();
-        var value = token.Type == TokenType.Minus ? -result.AsDouble() : result.AsDouble();
-        return new Identifier(DataTypes.Double, value);
+        var value = token.Type == TokenType.Minus 
+            ? -result.AsDouble() 
+            : result.AsDouble();
+        
+        return new Identifier(result.DataType, value);
     }
 
-    private Identifier EvaluateNumberToken()
+    private Identifier EvaluateNumber()
     {
         var token = NextIfTokenIs(TokenType.Number);
         return Identifier.FromToken(token);
     }
 
-    private Identifier EvaluateStringToken()
+    private Identifier EvaluateString()
     {
         var token = NextIfTokenIs(TokenType.String);
         return new Identifier(DataTypes.String, token.Value);
     }
 
-    private Identifier EvaluateBoolToken()
+    private Identifier EvaluateBool()
     {
         var token = NextIfTokenIs(TokenType.Bool);
         return new Identifier(DataTypes.Bool, token.Value);
     }
 
-    private Identifier EvaluateParenthesizedExpression()
+    private Identifier EvaluateParenthesis()
     {
         NextIfTokenIs(TokenType.OpenParenthesis);
         var result = EvaluateExpression();
         NextIfTokenIs(TokenType.CloseParenthesis);
         return result;
-    }
-
-    private Token NextIfTokenIs(TokenType type)
-    {
-        if (CurrentToken.Type != type)
-            throw new Exception($"Unexpected token: {CurrentToken.Type}, expected: {type}");
-
-        var token = CurrentToken;
-        _currentPosition++;
-        return token;
     }
     
     private static Identifier EvaluateOperation(Identifier left, Identifier right, Token @operator)
@@ -231,5 +224,15 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     {
         var nextPosition = _currentPosition + 1;
         return nextPosition < tokens.Count ? tokens[nextPosition] : tokens.Last();
+    }
+    
+    private Token NextIfTokenIs(TokenType type)
+    {
+        if (CurrentToken.Type != type)
+            throw new Exception($"Unexpected token: {CurrentToken.Type}, expected: {type}");
+
+        var token = CurrentToken;
+        _currentPosition++;
+        return token;
     }
 }

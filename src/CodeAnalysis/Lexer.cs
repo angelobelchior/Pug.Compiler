@@ -48,13 +48,7 @@ public class Lexer
                 continue;
             }
 
-            if (_currentChar == Token.MINUS && char.IsDigit(Peek()))
-            {
-                tokens.Add(ExtractNumber());
-                continue;
-            }
-
-            if (char.IsDigit(_currentChar))
+            if (_currentChar == Token.MINUS && char.IsDigit(Peek()) || char.IsDigit(_currentChar))
             {
                 tokens.Add(ExtractNumber());
                 continue;
