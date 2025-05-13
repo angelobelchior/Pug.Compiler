@@ -154,6 +154,28 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         _currentPosition++;
         return token;
     }
+    
+    private static Identifier EvaluateOperation(Identifier left, Identifier right, Token @operator)
+    {
+        switch (left.DataType)
+        {
+            case DataTypes.String when right.DataType == DataTypes.String:
+            case DataTypes.String when right.DataType == DataTypes.Int && @operator.Type == TokenType.Multiply:
+            case DataTypes.String when right.DataType == DataTypes.Double && @operator.Type == TokenType.Multiply:
+                return EvaluateStringOperation(left, right, @operator);
+            case DataTypes.Int when right.DataType == DataTypes.String  && @operator.Type == TokenType.Multiply:
+            case DataTypes.Double when right.DataType == DataTypes.String  && @operator.Type == TokenType.Multiply:
+                return EvaluateStringOperation(right, left, @operator);
+        }
+
+        if (left.DataType == DataTypes.Double ||
+            right.DataType == DataTypes.Double ||
+            left.DataType == DataTypes.Int ||
+            right.DataType == DataTypes.Int)
+            return EvaluateNumberOperation(left, right, @operator);
+
+        throw new Exception($"Unexpected token: {@operator.Type}");
+    }
 
     private static Identifier EvaluateStringOperation(Identifier left, Identifier right,
         Token @operator)
@@ -175,28 +197,6 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
                 result.Append(@string);
             return result.ToString();
         }
-    }
-
-    private static Identifier EvaluateOperation(Identifier left, Identifier right, Token @operator)
-    {
-        switch (left.DataType)
-        {
-            case DataTypes.String when right.DataType == DataTypes.String:
-            case DataTypes.String when right.DataType == DataTypes.Int && @operator.Type == TokenType.Multiply:
-            case DataTypes.String when right.DataType == DataTypes.Double && @operator.Type == TokenType.Multiply:
-                return EvaluateStringOperation(left, right, @operator);
-            case DataTypes.Int when right.DataType == DataTypes.String  && @operator.Type == TokenType.Multiply:
-            case DataTypes.Double when right.DataType == DataTypes.String  && @operator.Type == TokenType.Multiply:
-                return EvaluateStringOperation(right, left, @operator);
-        }
-
-        if (left.DataType == DataTypes.Double ||
-            right.DataType == DataTypes.Double ||
-            left.DataType == DataTypes.Int ||
-            right.DataType == DataTypes.Int)
-            return EvaluateNumberOperation(left, right, @operator);
-
-        throw new Exception($"Unexpected token: {@operator.Type}");
     }
 
     private static Identifier EvaluateNumberOperation(Identifier left, Identifier right,
