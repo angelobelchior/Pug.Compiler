@@ -10,7 +10,7 @@ public class None
 
 public class Identifier(DataTypes dataType, object value)
 {
-    private static readonly Dictionary<string, Func<Identifier, Identifier>> _typeConverters = new()
+    private static readonly Dictionary<string, Func<Identifier, Identifier>> TypeConverters = new()
     {
         ["int"] = value => new Identifier(DataTypes.Int, value.AsInt()),
         ["double"] = value => new Identifier(DataTypes.Double, value.AsDouble()),
@@ -48,7 +48,7 @@ public class Identifier(DataTypes dataType, object value)
         };
 
     public static bool ContainsDataType(string type)
-        => _typeConverters.ContainsKey(type);
+        => TypeConverters.ContainsKey(type);
 
     public static Identifier Default(string typeName)
         => typeName switch
@@ -71,7 +71,7 @@ public class Identifier(DataTypes dataType, object value)
                 $"Invalid type string. Expected a {typeName}"),
             DataTypes.Bool when typeName != "bool" => throw new Exception(
                 $"Invalid type bool. Expected a {typeName}"),
-            _ => _typeConverters.TryGetValue(typeName, out var cast)
+            _ => TypeConverters.TryGetValue(typeName, out var cast)
                 ? cast(this)
                 : throw new Exception($"Unknown type: {typeName}")
         };

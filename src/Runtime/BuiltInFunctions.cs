@@ -4,7 +4,7 @@ namespace Pug.Compiler.Runtime;
 
 public static class BuiltInFunctions
 {
-    private static readonly Dictionary<string, Func<List<Identifier>, Identifier>> _functions = new()
+    private static readonly Dictionary<string, Func<List<Identifier>, Identifier>> Functions = new()
     {
         ["sqrt"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Double, Math.Sqrt(args[0].AsDouble()))
@@ -75,11 +75,11 @@ public static class BuiltInFunctions
     };
 
     public static bool Contains(string functionName)
-        => _functions.ContainsKey(functionName);
+        => Functions.ContainsKey(functionName);
 
     public static Identifier Invoke(Token token, List<Identifier> args)
     {
-        var result = _functions.TryGetValue(token.Value, out var function)
+        var result = Functions.TryGetValue(token.Value, out var function)
             ? function(args)
             : throw new Exception($"Function {token.Value} not found");
 

@@ -47,6 +47,8 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(31, "idade = idade + 1", "1")]
     [InlineData(32, "string nome = \"Angelo\"", "Angelo")]
     [InlineData(33, "nome = nome + \" Belchior\"", "Angelo Belchior")]
+    [InlineData(34, "\"A\" * 3", "AAA")]
+    [InlineData(35, "3 * \"A\"", "AAA")]
     public void Must_Parse_Expressions(
 #pragma warning disable xUnit1026
         int order,
@@ -91,6 +93,12 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
     [InlineData("bool x = 12234", "Invalid type number. Expected a bool")]
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
+    [InlineData("3 + \"A\"", "Can't convert A to double")]
+    [InlineData("\"A\" + 3", "Can't convert A to double")]
+    [InlineData("3 - \"A\"", "Can't convert A to double")]
+    [InlineData("\"A\" - 3", "Can't convert A to double")]
+    [InlineData("3 / \"A\"", "Can't convert A to double")]
+    [InlineData("\"A\" / 3", "Can't convert A to double")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
         string exceptionMessage)

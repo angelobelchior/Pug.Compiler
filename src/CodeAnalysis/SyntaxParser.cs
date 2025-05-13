@@ -1,3 +1,4 @@
+using System.Text;
 using Pug.Compiler.Runtime;
 
 namespace Pug.Compiler.CodeAnalysis;
@@ -19,9 +20,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             var @operator = NextIfTokenIs(CurrentToken.Type);
             var right = EvaluateExpressionWithPriority();
 
-            left = left.DataType == DataTypes.String || right.DataType == DataTypes.String
-                ? EvaluateStringOperation(left, right, @operator)
-                : EvaluateNumberOperation(left, right, @operator);
+            left = EvaluateOperation(left, right, @operator);
         }
 
         return left;
@@ -35,12 +34,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         {
             var @operator = NextIfTokenIs(CurrentToken.Type);
             var right = EvaluateToken();
-
-            var value = @operator.Type == TokenType.Multiply
-                ? left.AsDouble() * right.AsDouble()
-                : left.AsDouble() / right.AsDouble();
-
-            left = new Identifier(DataTypes.Double, value);
+            left = EvaluateOperation(left, right, @operator);
         }
 
         return left;
@@ -52,7 +46,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             TokenType.DataType => EvaluateDataTypeToken(),
             TokenType.Identifier => EvaluateIdentifierToken(),
             TokenType.Function => EvaluateFunctionToken(),
-            TokenType.Plus or TokenType.Minus => EvaluateOperation(),
+            TokenType.Plus or TokenType.Minus => EvaluateSignal(),
             TokenType.Number => EvaluateNumberToken(),
             TokenType.String => EvaluateStringToken(),
             TokenType.Bool => EvaluateBoolToken(),
@@ -117,7 +111,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         return BuiltInFunctions.Invoke(token, args);
     }
 
-    private Identifier EvaluateOperation()
+    private Identifier EvaluateSignal()
     {
         var token = NextIfTokenIs(CurrentToken.Type);
         var result = EvaluateToken();
@@ -164,17 +158,58 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     private static Identifier EvaluateStringOperation(Identifier left, Identifier right,
         Token @operator)
     {
-        return @operator.Type == TokenType.Plus
-            ? new Identifier(DataTypes.String, left.AsString() + right.AsString())
-            : new Identifier(DataTypes.String, left.AsString().Replace(right.AsString(), string.Empty));
+        var value = @operator.Type switch
+        {
+            TokenType.Plus => left.AsString() + right.AsString(),
+            TokenType.Minus => left.AsString().Replace(right.AsString(), string.Empty),
+            TokenType.Multiply => Multiply(left.AsString(), right.AsInt()),
+            _ => throw new Exception($"Unexpected token: {@operator.Type}")
+        };
+
+        return new Identifier(DataTypes.String, value);
+
+        static string Multiply(string @string, int count)
+        {
+            var result = new StringBuilder();
+            for (var i = 0; i < count; i++)
+                result.Append(@string);
+            return result.ToString();
+        }
+    }
+
+    private static Identifier EvaluateOperation(Identifier left, Identifier right, Token @operator)
+    {
+        switch (left.DataType)
+        {
+            case DataTypes.String when right.DataType == DataTypes.String:
+            case DataTypes.String when right.DataType == DataTypes.Int && @operator.Type == TokenType.Multiply:
+            case DataTypes.String when right.DataType == DataTypes.Double && @operator.Type == TokenType.Multiply:
+                return EvaluateStringOperation(left, right, @operator);
+            case DataTypes.Int when right.DataType == DataTypes.String  && @operator.Type == TokenType.Multiply:
+            case DataTypes.Double when right.DataType == DataTypes.String  && @operator.Type == TokenType.Multiply:
+                return EvaluateStringOperation(right, left, @operator);
+        }
+
+        if (left.DataType == DataTypes.Double ||
+            right.DataType == DataTypes.Double ||
+            left.DataType == DataTypes.Int ||
+            right.DataType == DataTypes.Int)
+            return EvaluateNumberOperation(left, right, @operator);
+
+        throw new Exception($"Unexpected token: {@operator.Type}");
     }
 
     private static Identifier EvaluateNumberOperation(Identifier left, Identifier right,
         Token @operator)
     {
-        var value = @operator.Type == TokenType.Plus
-            ? left.AsDouble() + right.AsDouble()
-            : left.AsDouble() - right.AsDouble();
+        var value = @operator.Type switch
+        {
+            TokenType.Plus => left.AsDouble() + right.AsDouble(),
+            TokenType.Minus => left.AsDouble() - right.AsDouble(),
+            TokenType.Multiply => left.AsDouble() * right.AsDouble(),
+            TokenType.Divide => left.AsDouble() / right.AsDouble(),
+            _ => throw new Exception($"Unexpected token: {@operator.Type}")
+        };
 
         return new Identifier(DataTypes.Double, value);
     }
@@ -195,6 +230,6 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     private Token Peek()
     {
         var nextPosition = _currentPosition + 1;
-        return nextPosition < tokens.Count ? tokens[nextPosition] : tokens[^1];
+        return nextPosition < tokens.Count ? tokens[nextPosition] : tokens.Last();
     }
 }
