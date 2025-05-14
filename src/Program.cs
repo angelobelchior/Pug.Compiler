@@ -12,8 +12,8 @@ while (true)
         var lexer = new Lexer(input);
         var tokens = lexer.CreateTokens();
 
-        var parser = new Parser(tokens);
-        var result = parser.Parse();
+        var syntaxParser = new SyntaxParser(tokens);
+        var result = syntaxParser.Parse();
 
         Console.WriteLine(result);
     }
