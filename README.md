@@ -16,7 +16,7 @@ A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará c
 **Link para o Post:** 
 - https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-2-2jmi
 
-**Link para o PR:** 
+**Link para a Branch:** 
 - https://github.com/angelobelchior/Pug.Compiler/tree/parte2
 
 **Funcionalidades:**
