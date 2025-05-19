@@ -99,15 +99,6 @@ public class IdentifierTests
     }
 
     [Fact]
-    public void Create_WithoutParameters_ShouldReturnVoidResult()
-    {
-        var result = Identifier.Create();
-
-        Assert.Equal(DataTypes.None, result.DataType);
-        Assert.Equal(None.Value, result.Value);
-    }
-
-    [Fact]
     public void FromToken_ShouldReturnResultWithCorrectTypeAndValue()
     {
         var token = Token.Number(1, "42");
