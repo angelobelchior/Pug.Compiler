@@ -93,7 +93,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("int x = \"abcd\"", "Invalid type string. Expected a int")]
     [InlineData("double x = false", "Invalid type bool. Expected a double")]
     [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
-    [InlineData("bool x = 12234", "Invalid type number. Expected a bool")]
+    [InlineData("bool x = 12234", "Invalid type int or double. Expected a bool")]
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
@@ -124,7 +124,7 @@ public class GeneralTests(SharedValue sharedValue)
             var syntaxParser = new SyntaxParser(results, tokens);
             var result = syntaxParser.Evaluate();
 
-            Assert.Equal(10, result[0].AsInt());
+            Assert.Equal(10, result[0].ToInt());
 
             lexer = new Lexer("idade = y");
             tokens = lexer.ExtractTokens();

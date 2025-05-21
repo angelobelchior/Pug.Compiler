@@ -24,7 +24,7 @@ public class IdentifierTests
         var result = Identifier.Create(DataTypes.Int, value);
 
         Assert.Equal(DataTypes.Int, result.DataType);
-        Assert.Equal(42, result.AsInt());
+        Assert.Equal(42, result.ToInt());
     }
 
     [Theory]
@@ -33,7 +33,7 @@ public class IdentifierTests
     public void Create_WithInvalidValueInt_ShouldThrowException(object value)
     {
         var result = Identifier.Create(DataTypes.Int, value);
-        Assert.Throws<Exception>(() => result.AsInt());
+        Assert.Throws<Exception>(() => result.ToInt());
     }
 
     [Theory]
@@ -44,7 +44,7 @@ public class IdentifierTests
         var result = Identifier.Create(DataTypes.Double, value);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal(42.5, result.AsDouble());
+        Assert.Equal(42.5, result.ToDouble());
     }
     
     [Theory]
@@ -53,7 +53,7 @@ public class IdentifierTests
     public void Create_WithInvalidValueDouble_ShouldThrowException(object value)
     {
         var result = Identifier.Create(DataTypes.Double, value);
-        Assert.Throws<Exception>(() => result.AsDouble());
+        Assert.Throws<Exception>(() => result.ToDouble());
     }
 
     [Theory]
@@ -65,7 +65,7 @@ public class IdentifierTests
         var result = Identifier.Create(DataTypes.Bool, value);
 
         Assert.Equal(DataTypes.Bool, result.DataType);
-        Assert.True(result.AsBool());
+        Assert.True(result.ToBool());
     }
     
     [Theory]
@@ -77,7 +77,7 @@ public class IdentifierTests
         var result = Identifier.Create(DataTypes.Bool, value);
 
         Assert.Equal(DataTypes.Bool, result.DataType);
-        Assert.False(result.AsBool());
+        Assert.False(result.ToBool());
     }
     
     [Theory]
@@ -86,7 +86,7 @@ public class IdentifierTests
     public void Create_WithInvalidValueBoolean_ShouldThrowException(object value)
     {
         var result = Identifier.Create(DataTypes.Bool, value);
-        Assert.Throws<Exception>(() => result.AsBool());
+        Assert.Throws<Exception>(() => result.ToBool());
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class IdentifierTests
         var castedValue = result.Cast("double");
 
         Assert.Equal(DataTypes.Double, castedValue.DataType);
-        Assert.Equal(42.5, castedValue.AsDouble());
+        Assert.Equal(42.5, castedValue.ToDouble());
     }
 
     [Fact]
