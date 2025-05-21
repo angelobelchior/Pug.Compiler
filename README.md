@@ -7,7 +7,7 @@ Essa construção será dividida em partes e cada parte terá um post e uma bran
 Cada post vai conter a explicação e implementação de uma ou mais funcionalidades do compilador e sempre estará associado a uma branch (parte1, parte2, etc.)
 
 
-A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 2](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-2-2jmi))
+A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 2](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-2-2jmi).
 
 ----
 
