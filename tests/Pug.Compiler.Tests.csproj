@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Pug.Compiler.csproj" />
+      <ProjectReference Include="..\src\Compiler\Pug.Compiler.csproj" />
     </ItemGroup>
 
 </Project>
