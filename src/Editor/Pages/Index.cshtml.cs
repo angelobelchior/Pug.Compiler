@@ -8,7 +8,7 @@ namespace Pug.Compiler.Editor.Pages;
 
 public class IndexModel : PageModel
 {
-    public string ConsoleResult { get; set; } = string.Empty;
+    public string Result { get; set; } = string.Empty;
     public string Code { get; set; } = "print(\"Olá Mundo!\")";
     public List<Token> Tokens { get; set; } = [];
     public List<Identifier> Identifiers { get; set; } = [];
@@ -16,24 +16,41 @@ public class IndexModel : PageModel
     public void OnPost()
     {
         Code = Request.Form["editor-content"].ToString();
-        
+
         if (string.IsNullOrWhiteSpace(Code))
             return;
         try
         {
+            var writer = Console.Out;
+            
             using var sw = new StringWriter();
             Console.SetOut(sw);
-        
+
             Dictionary<string, Identifier> identifiers = new();
             var lexer = new Lexer(Code);
             Tokens = lexer.ExtractTokens();
             var syntaxParser = new SyntaxParser(identifiers, Tokens);
             Identifiers = syntaxParser.Evaluate();
-            ConsoleResult = sw.ToString().Replace("\n", "<br/>");
+            
+            var result = sw.ToString();
+            if (string.IsNullOrEmpty(result))
+            {
+                Result = string.Empty;
+            }
+            else
+            {
+                var parts = result
+                    .Split("\n")
+                    .Where(v => !string.IsNullOrWhiteSpace(v))
+                    .Select(v => $"> {v}<br/>");
+                Result = string.Join("", parts);
+            }
+            
+            Console.SetOut(writer);
         }
         catch (Exception e)
         {
-            ConsoleResult = e.Message;
+            Result = e.Message;
         }
     }
 }

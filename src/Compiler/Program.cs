@@ -1,8 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Pug.Compiler.CodeAnalysis;
 using Pug.Compiler.Runtime;
 
 Dictionary<string, Identifier> identifiers = new();
+
+var printTokens = false;
 
 while (true)
 {
@@ -12,8 +14,9 @@ while (true)
         Console.Write("> ");
 
         var line = Console.ReadLine() ?? string.Empty;
+
         Console.ResetColor();
-        
+
         if (line.Equals("/quit", StringComparison.CurrentCultureIgnoreCase))
             return;
 
@@ -23,17 +26,28 @@ while (true)
             continue;
         }
 
+        if (line.Equals(":t", StringComparison.CurrentCultureIgnoreCase))
+        {
+            printTokens = !printTokens;
+            Console.WriteLine($"Print tokens: {printTokens}");
+            continue;
+        }
+
         if (string.IsNullOrEmpty(line))
             break;
 
         var lexer = new Lexer(line);
         var tokens = lexer.ExtractTokens();
 
-        var syntaxParser = new SyntaxParser(identifiers, tokens);
-        var result = syntaxParser.Evaluate();
+        if (printTokens)
+            PrintTokens(tokens);
 
-        if (result.DataType != DataTypes.None)
-            WriteLine(result.Value, ConsoleColor.Blue);
+        var syntaxParser = new SyntaxParser(identifiers, tokens);
+        var results = syntaxParser.Evaluate();
+
+        foreach (var result in results)
+            if (result.DataType != DataTypes.None)
+                WriteLine(result.Value, ConsoleColor.Blue);
     }
     catch (Exception ex)
     {
@@ -46,6 +60,12 @@ static void WriteLine(object message, ConsoleColor color)
     Console.ForegroundColor = color;
     Console.WriteLine(message);
     Console.ResetColor();
+}
+
+static void PrintTokens(IEnumerable<Token> tokens)
+{
+    foreach (var token in tokens)
+        Console.WriteLine(token);
 }
 
 [ExcludeFromCodeCoverage]

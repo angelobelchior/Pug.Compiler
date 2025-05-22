@@ -14,14 +14,14 @@ public class Lexer
     {
         _text = text;
         _currentPosition = 0;
-        _currentChar = _text.Length > 0 ? _text[_currentPosition] : Token.EOF;
+        _currentChar = _text.Length > 0 ? _text[_currentPosition] : Token.END_OF_FILE;
     }
 
     public List<Token> ExtractTokens()
     {
         var tokens = new List<Token>();
 
-        while (_currentChar != Token.EOF)
+        while (_currentChar != Token.END_OF_FILE)
         {
             if (char.IsWhiteSpace(_currentChar))
             {
@@ -85,7 +85,7 @@ public class Lexer
         Next();
         var stringValue = new StringBuilder();
 
-        while (_currentChar != Token.QUOTE && _currentChar != Token.EOF)
+        while (_currentChar != Token.QUOTE && _currentChar != Token.END_OF_FILE)
         {
             stringValue.Append(_currentChar);
             Next();
@@ -166,13 +166,13 @@ public class Lexer
     private char Peek()
     {
         var position = _currentPosition + 1;
-        return position < _text.Length ? _text[position] : Token.EOF;
+        return position < _text.Length ? _text[position] : Token.END_OF_FILE;
     }
 
     private void Next()
     {
         _currentPosition++;
-        _currentChar = _currentPosition < _text.Length ? _text[_currentPosition] : Token.EOF;
+        _currentChar = _currentPosition < _text.Length ? _text[_currentPosition] : Token.END_OF_FILE;
     }
 
     private void IgnoreWhitespace()

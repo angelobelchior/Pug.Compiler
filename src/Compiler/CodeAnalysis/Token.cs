@@ -2,7 +2,7 @@ namespace Pug.Compiler.CodeAnalysis;
 
 public class Token
 {
-    public const char EOF = '\0';
+    public const char END_OF_FILE = '\0';
 
     public const char QUOTE = '"';
 
@@ -26,7 +26,7 @@ public class Token
     public int Position { get; }
 
     public static Token EndOfFile(int position)
-        => new(TokenType.EndOfFile, EOF, position);
+        => new(TokenType.EndOfFile, END_OF_FILE, position);
 
     public static Token DataType(int position, string value)
         => new(TokenType.DataType, value, position);
@@ -81,4 +81,7 @@ public class Token
         : this(tokenType, value.ToString(), position)
     {
     }
+
+    public override string ToString()
+        => $"TokenType.{Type} => {Value} (Position: {Position})";
 }
