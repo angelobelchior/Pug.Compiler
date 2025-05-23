@@ -28,6 +28,12 @@ public class Lexer
                 IgnoreWhitespace();
                 continue;
             }
+            
+            if (_currentChar == Token.DIVIDER && Peek() == Token.DIVIDER)
+            {
+                IgnoreComment();
+                continue;
+            }
 
             if (char.IsLetter(_currentChar))
             {
@@ -41,7 +47,7 @@ public class Lexer
                 continue;
             }
 
-            if (_currentChar == Token.ASSIGN)
+            if (_currentChar == Token.EQUAL)
             {
                 tokens.Add(Token.Assign(_currentPosition));
                 Next();
@@ -178,6 +184,15 @@ public class Lexer
     private void IgnoreWhitespace()
     {
         while (char.IsWhiteSpace(_currentChar))
+            Next();
+    }
+    
+    private void IgnoreComment()
+    {
+        while (_currentChar != Token.NEW_LINE && _currentChar != Token.END_OF_FILE)
+            Next();
+
+        if (_currentChar == Token.NEW_LINE)
             Next();
     }
 }

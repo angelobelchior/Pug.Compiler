@@ -50,7 +50,9 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(34, "\"A\" * 3", "AAA")]
     [InlineData(35, "3 * \"A\"", "AAA")]
     [InlineData(36, "\"A\" + 3", "A3")]
-    [InlineData(37, "3 + \"A\"", "3A")]
+    [InlineData(37, "3 + \"A\" //esse comentário", "3A")]
+    [InlineData(38, "//este é um comentário", "\0")]
+    [InlineData(39, "string texto = \"Esse texto tem // barras\"", "Esse texto tem // barras")]
     public void Must_Parse_Expressions(
 #pragma warning disable xUnit1026
         int order,
@@ -64,7 +66,10 @@ public class GeneralTests(SharedValue sharedValue)
         var syntaxParser = new SyntaxParser(_expressionResults, tokens);
         var result = syntaxParser.Evaluate();
 
-        Assert.Equal(expectedResult, result[0].Value.ToString());
+        if (expectedResult == "\0")
+            Assert.Empty(result);
+        else
+            Assert.Equal(expectedResult, result[0].Value.ToString());
     }
 
     [Theory]

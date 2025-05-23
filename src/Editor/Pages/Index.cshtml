@@ -47,7 +47,8 @@
                                     monaco.languages.setMonarchTokensProvider('pug-lang', {
                                         tokenizer: {
                                             root: [
-                                                [/\b(int|double|string|bool|true|false|func|if|else|end|print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear)\b/, 'keyword'],
+                                                [/\/\/.*/, 'comment'],
+                                                [/\b(int|double|string|bool|true|false|func|if|else|end|then|print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear)\b/, 'keyword'],
                                                 [/\b(int|string)\b/, 'type'],
                                                 [/\b(==|=|\+|-|\*|\/|==)\b/, 'operator'],
                                                 [/\b\d+\b/, 'number'],
@@ -70,7 +71,7 @@
                                         ],
                                         folding: {
                                             markers: {
-                                                start: /^(if|else|func|end|return)\b/,
+                                                start: /^(if|else|func|end|then|return)\b/,
                                                 end: /^(end)\b/
                                             }
                                         }

@@ -9,7 +9,16 @@ namespace Pug.Compiler.Editor.Pages;
 public class IndexModel : PageModel
 {
     public string Result { get; set; } = string.Empty;
-    public string Code { get; set; } = "print(\"Olá Mundo!\")";
+
+    public string Code { get; set; } =
+"""
+int idade = 41
+if idade == 1 then
+    print("igual")
+else
+    print("diferente")
+end
+""";
     public List<Token> Tokens { get; set; } = [];
     public List<Identifier> Identifiers { get; set; } = [];
 
