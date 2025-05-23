@@ -28,24 +28,20 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     private Identifier EvaluateLogicalOr()
     {
         var left = EvaluateLogicalAnd();
-        while (CurrentToken.Type == TokenType.Or)
-        {
-            var op = NextIfTokenIs(TokenType.Or);
-            var right = EvaluateLogicalAnd();
-            left = EvaluateLogicalOperation(left, right, op);
-        }
+        if (CurrentToken.Type != TokenType.Or) return left;
+        var or = NextIfTokenIs(TokenType.Or);
+        var right = EvaluateLogicalAnd();
+        left = EvaluateLogicalOperation(left, right, or);
         return left;
     }
 
     private Identifier EvaluateLogicalAnd()
     {
         var left = EvaluateComparison();
-        while (CurrentToken.Type == TokenType.And)
-        {
-            var op = NextIfTokenIs(TokenType.And);
-            var right = EvaluateComparison();
-            left = EvaluateLogicalOperation(left, right, op);
-        }
+        if (CurrentToken.Type != TokenType.And) return left;
+        var and = NextIfTokenIs(TokenType.And);
+        var right = EvaluateComparison();
+        left = EvaluateLogicalOperation(left, right, and);
         return left;
     }
 
