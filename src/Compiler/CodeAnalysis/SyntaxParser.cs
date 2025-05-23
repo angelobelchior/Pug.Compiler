@@ -24,6 +24,13 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     {
         var left = EvaluateExpressionWithPriority();
 
+        if (Token.IsOperatorType(CurrentToken.Type))
+        {
+            var @operator = NextIfTokenIs(CurrentToken.Type);
+            var right = EvaluateExpressionWithPriority();
+            left = EvaluateComparison(left, right, @operator);
+        }
+
         while (CurrentToken.Type is TokenType.Plus or TokenType.Minus)
         {
             var @operator = NextIfTokenIs(CurrentToken.Type);
@@ -175,7 +182,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     {
         var value = @operator.Type switch
         {
-            TokenType.Plus => left.ToString() + right.ToString(),
+            TokenType.Plus => left + right.ToString(),
             TokenType.Minus => Minus(left.ToString(), right.ToString()),
             TokenType.Multiply => Multiply(),
             _ => throw new Exception($"Unexpected token: {@operator.Type}")
@@ -236,6 +243,89 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
         identifiers[variableName] = value;
         return value;
+    }
+
+    private static Identifier EvaluateComparison(Identifier left, Identifier right, Token @operator)
+    {
+        var result = @operator.Type switch
+        {
+            TokenType.Equal => Equal(),
+            TokenType.NotEqual => !Equal(),
+            TokenType.Greater => Greater(),
+            TokenType.GreaterOrEqual => Greater() || Equal(),
+            TokenType.Less => Less(),
+            TokenType.LessOrEqual => Less() || Equal(),
+            _ => throw new Exception($"Unexpected comparison operator: {@operator.Type}")
+        };
+
+        return new Identifier(DataTypes.Bool, result.ToString().ToLower());
+
+        bool Equal()
+        {
+            EnsureSameTypes();
+
+            if (left.DataType == DataTypes.String || right.DataType == DataTypes.String)
+                return left.ToString() == right.ToString();
+
+            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Double)
+                return Math.Abs(left.ToDouble() - right.ToDouble()) < 0.01;
+
+            if (left.DataType == DataTypes.Int || right.DataType == DataTypes.Int)
+                return left.ToInt() == right.ToInt();
+
+            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Int)
+                return Math.Abs(left.ToDouble() - right.ToInt()) < 0.01;
+
+            if (left.DataType == DataTypes.Int || right.DataType == DataTypes.Double)
+                return Math.Abs(left.ToInt() - right.ToDouble()) < 0.01;
+
+            if (left.DataType == DataTypes.Bool || right.DataType == DataTypes.Bool)
+                return left.ToBool() == right.ToBool();
+
+            return left.ToString() == right.ToString();
+        }
+
+        bool Greater()
+        {
+            EnsureSameTypes();
+
+            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Double)
+                return left.ToDouble() > right.ToDouble();
+
+            if (left.DataType == DataTypes.Int || right.DataType == DataTypes.Int)
+                return left.ToInt() > right.ToInt();
+
+            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Int)
+                return left.ToDouble() > right.ToInt();
+            
+            return left.ToInt() > right.ToDouble();
+        }
+        
+        bool Less()
+        {
+            EnsureSameTypes();
+
+            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Double)
+                return left.ToDouble() < right.ToDouble();
+
+            if (left.DataType == DataTypes.Int || right.DataType == DataTypes.Int)
+                return left.ToInt() < right.ToInt();
+
+            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Int)
+                return left.ToDouble() < right.ToInt();
+            
+            return left.ToInt() < right.ToDouble();
+        }
+
+        void EnsureSameTypes()
+        {
+            if (Identifier.AllAreNumberTypes(left.DataType, right.DataType))
+                return;
+
+            if (left.DataType != right.DataType)
+                throw new Exception(
+                    $"Cannot apply {@operator.Type} operator to different types: {left.DataType} and {right.DataType}");
+        }
     }
 
     private Token Peek()

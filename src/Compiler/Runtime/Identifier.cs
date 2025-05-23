@@ -53,6 +53,9 @@ public class Identifier(DataTypes dataType, object value)
 
     public static bool ContainsDataType(string type)
         => TypeConverters.ContainsKey(type);
+    
+    public static bool AllAreNumberTypes(params DataTypes[] types)
+        => types.All(type => type is DataTypes.Double or DataTypes.Int);
 
     public static Identifier Default(string typeName)
         => typeName switch

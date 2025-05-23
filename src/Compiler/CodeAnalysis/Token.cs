@@ -35,14 +35,14 @@ public class Token
     public TokenType Type { get; }
     public string Value { get; }
     public int Position { get; }
-    
+
     private Token(TokenType tokenType, string value, int position)
     {
         Type = tokenType;
         Value = value;
         Position = position;
     }
-    
+
     private Token(TokenType tokenType, char value, int position)
         : this(tokenType, value.ToString(), position)
     {
@@ -122,12 +122,22 @@ public class Token
 
     public static Token NotEqual(int position)
         => new(TokenType.NotEqual, NOT + EQUAL.ToString(), position);
-    
+
     public static Token And(int position)
         => new(TokenType.And, AMPERSAND + AMPERSAND.ToString(), position);
 
     public static Token Or(int position)
         => new(TokenType.Or, PIPE + PIPE.ToString(), position);
+
+
+    public static bool IsOperatorType(TokenType type)
+        => type is
+            TokenType.Equal or
+            TokenType.NotEqual or
+            TokenType.Greater or
+            TokenType.GreaterOrEqual or
+            TokenType.Less or
+            TokenType.LessOrEqual;
 
     public override string ToString()
         => $"TokenType.{Type} => {Value} (Position: {Position})";

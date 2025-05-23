@@ -118,70 +118,45 @@ public class Lexer
 
     private Token ExtractSymbols()
     {
-        if (_currentChar == Token.AMPERSAND && Peek() == Token.AMPERSAND)
-        {
-            var pos = _currentPosition;
-            Next(2);
-            return Token.And(pos);
-        }
-        if (_currentChar == Token.PIPE && Peek() == Token.PIPE)
-        {
-            var pos = _currentPosition;
-            Next(2);
-            return Token.Or(pos);
-        }
-        if (_currentChar == Token.EQUAL && Peek() == Token.EQUAL)
-        {
-            var pos = _currentPosition;
-            Next(2);
-            return Token.Equal(pos);
-        }
-        if (_currentChar == Token.NOT && Peek() == Token.EQUAL)
-        {
-            var pos = _currentPosition;
-            Next(2); 
-            return Token.NotEqual(pos);
-        }
-        if (_currentChar == Token.GREATER && Peek() == Token.EQUAL)
-        {
-            var pos = _currentPosition;
-            Next(2);
-            return Token.GreaterOrEqual(pos);
-        }
-        if (_currentChar == Token.LESS && Peek() == Token.EQUAL)
-        {
-            var pos = _currentPosition;
-            Next(2);
-            return Token.LessOrEqual(pos);
-        }
-        if (_currentChar == Token.GREATER)
-        {
-            var pos = _currentPosition;
-            Next();
-            return Token.Greater(pos);
-        }
-        if (_currentChar == Token.LESS)
-        {
-            var pos = _currentPosition;
-            Next();
-            return Token.Less(pos);
-        }
-        
         var position = _currentPosition;
-        var token = _currentChar switch
+
+        var doubleCharToken = (currentChar: _currentChar, nextChar: Peek()) switch
         {
-            Token.PLUS => Token.Plus(position),
-            Token.MINUS => Token.Minus(position),
-            Token.MULTIPLY => Token.Multiply(position),
-            Token.DIVIDER => Token.Divide(_currentPosition),
-            Token.OPEN_PARENTHESIS => Token.OpenParenthesis(position),
-            Token.CLOSE_PARENTHESIS => Token.CloseParenthesis(position),
-            Token.COMMA => Token.Comma(position),
-            _ => throw new Exception($"Unexpected character {_currentChar} at position {position}")
+            (Token.AMPERSAND, Token.AMPERSAND) => Token.And(position),
+            (Token.PIPE, Token.PIPE) => Token.Or(position),
+            (Token.EQUAL, Token.EQUAL) => Token.Equal(position),
+            (Token.NOT, Token.EQUAL) => Token.NotEqual(position),
+            (Token.GREATER, Token.EQUAL) => Token.GreaterOrEqual(position),
+            (Token.LESS, Token.EQUAL) => Token.LessOrEqual(position),
+            _ => null
+        };
+        
+        if (doubleCharToken is not null)
+        {
+            Next(2);
+            return doubleCharToken;
+        }
+
+        var singleCharTokenFactory = new Dictionary<char, Func<int, Token>>
+        {
+            [Token.PLUS] = Token.Plus,
+            [Token.MINUS] = Token.Minus,
+            [Token.MULTIPLY] = Token.Multiply,
+            [Token.DIVIDER] = Token.Divide,
+            [Token.OPEN_PARENTHESIS] = Token.OpenParenthesis,
+            [Token.CLOSE_PARENTHESIS] = Token.CloseParenthesis,
+            [Token.COMMA] = Token.Comma,
+            [Token.GREATER] = Token.Greater,
+            [Token.LESS] = Token.Less
         };
 
-        Next();
-        return token;
+        if (singleCharTokenFactory.TryGetValue(_currentChar, out var tokenFactory))
+        {
+            Next();
+            return tokenFactory(position);
+        }
+
+        throw new Exception($"Unexpected character {_currentChar} at position {position}");
     }
 
     private Token ExtractNumber()

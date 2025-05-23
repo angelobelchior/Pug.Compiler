@@ -53,6 +53,17 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(37, "3 + \"A\" //esse comentário", "3A")]
     [InlineData(38, "//este é um comentário", "\0")]
     [InlineData(39, "string texto = \"Esse texto tem // barras\"", "Esse texto tem // barras")]
+    [InlineData(40, "1==1", "true")]
+    [InlineData(41, "1!=1", "false")]
+    [InlineData(42, "\"a\"==\"a\"", "true")]
+    [InlineData(43, "\"a\"!=\"a\"", "false")]
+    [InlineData(44, "\"a\"==\"b\"", "false")]
+    [InlineData(45, "\"a\"!=\"b\"", "true")]
+    [InlineData(46, "true==true", "true")]
+    [InlineData(47, "true!=true", "false")]
+    [InlineData(48, "false==false", "true")]
+    [InlineData(49, "false!=false", "false")]
+    [InlineData(50, "1 == (2*3)", "false")]
     public void Must_Parse_Expressions(
 #pragma warning disable xUnit1026
         int order,
@@ -100,6 +111,8 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
     [InlineData("bool x = 12234", "Invalid type int or double. Expected a bool")]
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
+    [InlineData("1 == \"abcd\"", "Cannot apply Equal operator to different types: Double and String")]
+    [InlineData("1 != \"abcd\"", "Cannot apply NotEqual operator to different types: Double and String")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
         string exceptionMessage)
