@@ -87,6 +87,15 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("4 == pow(2)", "true")]
     [InlineData("3 == (pow(2) - 1)", "true")]
     [InlineData("4 == (pow(2) - 1)", "false")]
+    [InlineData("3 == pow(2) - 1", "true")]
+    [InlineData("true && true", "true")]
+    [InlineData("true && false", "false")]
+    [InlineData("false && false", "false")]
+    [InlineData("false && true", "false")]
+    [InlineData("true || true", "true")]
+    [InlineData("true || false", "true")]
+    [InlineData("false || false", "false")]
+    [InlineData("false || true", "true")]
     public void Must_Parse_Expressions(
         string expression,
         string expectedResult)
@@ -133,7 +142,6 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
     [InlineData("1 == \"abcd\"", "Cannot apply Equal operator to different types: Double and String")]
     [InlineData("1 != \"abcd\"", "Cannot apply NotEqual operator to different types: Double and String")]
-    [InlineData("3 == pow(2) - 1", "Can't convert false to double")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
         string exceptionMessage)

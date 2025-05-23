@@ -54,6 +54,16 @@ public class Identifier(DataTypes dataType, object value)
     public static bool ContainsDataType(string type)
         => TypeConverters.ContainsKey(type);
     
+    public static void  EnsureSameTypes(Identifier left, Identifier right, Token @operator)
+    {
+        if (AllAreNumberTypes(left.DataType, right.DataType))
+            return;
+
+        if (left.DataType != right.DataType)
+            throw new Exception(
+                $"Cannot apply {@operator.Type} operator to different types: {left.DataType} and {right.DataType}");
+    }
+    
     public static bool AllAreNumberTypes(params DataTypes[] types)
         => types.All(type => type is DataTypes.Double or DataTypes.Int);
 

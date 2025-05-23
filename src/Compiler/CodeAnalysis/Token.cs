@@ -130,7 +130,7 @@ public class Token
         => new(TokenType.Or, PIPE + PIPE.ToString(), position);
 
 
-    public static bool IsOperatorType(TokenType type)
+    public static bool IsMathOperatorType(TokenType type)
         => type is
             TokenType.Equal or
             TokenType.NotEqual or
@@ -138,6 +138,11 @@ public class Token
             TokenType.GreaterOrEqual or
             TokenType.Less or
             TokenType.LessOrEqual;
+    
+    public static bool IsLogicalOperatorType(TokenType type)
+        => type is
+            TokenType.And or
+            TokenType.Or;
 
     public override string ToString()
         => $"TokenType.{Type} => {Value} (Position: {Position})";

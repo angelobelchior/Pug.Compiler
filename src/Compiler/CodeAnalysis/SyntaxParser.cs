@@ -22,37 +22,66 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
     private Identifier EvaluateExpression()
     {
-        var left = EvaluateExpressionWithPriority();
+        return EvaluateLogicalOr();
+    }
 
-        if (Token.IsOperatorType(CurrentToken.Type))
+    private Identifier EvaluateLogicalOr()
+    {
+        var left = EvaluateLogicalAnd();
+        while (CurrentToken.Type == TokenType.Or)
         {
-            var @operator = NextIfTokenIs(CurrentToken.Type);
-            var right = EvaluateExpressionWithPriority();
-            left = EvaluateComparison(left, right, @operator);
+            var op = NextIfTokenIs(TokenType.Or);
+            var right = EvaluateLogicalAnd();
+            left = EvaluateLogicalOperation(left, right, op);
         }
-
-        while (CurrentToken.Type is TokenType.Plus or TokenType.Minus)
-        {
-            var @operator = NextIfTokenIs(CurrentToken.Type);
-            var right = EvaluateExpressionWithPriority();
-
-            left = EvaluateOperation(left, right, @operator);
-        }
-
         return left;
     }
 
-    private Identifier EvaluateExpressionWithPriority()
+    private Identifier EvaluateLogicalAnd()
+    {
+        var left = EvaluateComparison();
+        while (CurrentToken.Type == TokenType.And)
+        {
+            var op = NextIfTokenIs(TokenType.And);
+            var right = EvaluateComparison();
+            left = EvaluateLogicalOperation(left, right, op);
+        }
+        return left;
+    }
+
+    private Identifier EvaluateComparison()
+    {
+        var left = EvaluatePlusOrMinus();
+        while (Token.IsMathOperatorType(CurrentToken.Type))
+        {
+            var op = NextIfTokenIs(CurrentToken.Type);
+            var right = EvaluatePlusOrMinus();
+            left = EvaluateComparison(left, right, op);
+        }
+        return left;
+    }
+
+    private Identifier EvaluatePlusOrMinus()
+    {
+        var left = EvaluateMultiplyOrDivide();
+        while (CurrentToken.Type is TokenType.Plus or TokenType.Minus)
+        {
+            var op = NextIfTokenIs(CurrentToken.Type);
+            var right = EvaluateMultiplyOrDivide();
+            left = EvaluateOperation(left, right, op);
+        }
+        return left;
+    }
+
+    private Identifier EvaluateMultiplyOrDivide()
     {
         var left = EvaluateToken();
-
         while (CurrentToken.Type is TokenType.Multiply or TokenType.Divide)
         {
-            var @operator = NextIfTokenIs(CurrentToken.Type);
+            var op = NextIfTokenIs(CurrentToken.Type);
             var right = EvaluateToken();
-            left = EvaluateOperation(left, right, @operator);
+            left = EvaluateOperation(left, right, op);
         }
-
         return left;
     }
 
@@ -247,6 +276,8 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
     private static Identifier EvaluateComparison(Identifier left, Identifier right, Token @operator)
     {
+        Identifier.EnsureSameTypes(left, right, @operator);
+
         var result = @operator.Type switch
         {
             TokenType.Equal => Equal(),
@@ -262,8 +293,6 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
         bool Equal()
         {
-            EnsureSameTypes();
-
             if (left.DataType == DataTypes.String || right.DataType == DataTypes.String)
                 return left.ToString() == right.ToString();
 
@@ -287,8 +316,6 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
         bool Greater()
         {
-            EnsureSameTypes();
-
             if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Double)
                 return left.ToDouble() > right.ToDouble();
 
@@ -297,14 +324,12 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
             if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Int)
                 return left.ToDouble() > right.ToInt();
-            
+
             return left.ToInt() > right.ToDouble();
         }
-        
+
         bool Less()
         {
-            EnsureSameTypes();
-
             if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Double)
                 return left.ToDouble() < right.ToDouble();
 
@@ -313,19 +338,24 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
             if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Int)
                 return left.ToDouble() < right.ToInt();
-            
+
             return left.ToInt() < right.ToDouble();
         }
+    }
 
-        void EnsureSameTypes()
+    private static Identifier EvaluateLogicalOperation(Identifier left, Identifier right, Token @operator)
+    {
+        if (left.DataType != DataTypes.Bool || right.DataType != DataTypes.Bool)
+            throw new Exception($"Logical operator {@operator.Type} can only be applied to bool types");
+
+        var result = @operator.Type switch
         {
-            if (Identifier.AllAreNumberTypes(left.DataType, right.DataType))
-                return;
+            TokenType.And => left.ToBool() && right.ToBool(),
+            TokenType.Or => left.ToBool() || right.ToBool(),
+            _ => throw new Exception($"Unexpected logical operator: {@operator.Type}")
+        };
 
-            if (left.DataType != right.DataType)
-                throw new Exception(
-                    $"Cannot apply {@operator.Type} operator to different types: {left.DataType} and {right.DataType}");
-        }
+        return new Identifier(DataTypes.Bool, result);
     }
 
     private Token Peek()
