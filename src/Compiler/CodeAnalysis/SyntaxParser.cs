@@ -258,7 +258,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             _ => throw new Exception($"Unexpected comparison operator: {@operator.Type}")
         };
 
-        return new Identifier(DataTypes.Bool, result.ToString().ToLower());
+        return new Identifier(DataTypes.Bool, result);
 
         bool Equal()
         {

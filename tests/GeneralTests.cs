@@ -47,27 +47,47 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(31, "idade = idade + 1", "1")]
     [InlineData(32, "string nome = \"Angelo\"", "Angelo")]
     [InlineData(33, "nome = nome + \" Belchior\"", "Angelo Belchior")]
-    [InlineData(34, "\"A\" * 3", "AAA")]
-    [InlineData(35, "3 * \"A\"", "AAA")]
-    [InlineData(36, "\"A\" + 3", "A3")]
-    [InlineData(37, "3 + \"A\" //esse comentário", "3A")]
-    [InlineData(38, "//este é um comentário", "\0")]
-    [InlineData(39, "string texto = \"Esse texto tem // barras\"", "Esse texto tem // barras")]
-    [InlineData(40, "1==1", "true")]
-    [InlineData(41, "1!=1", "false")]
-    [InlineData(42, "\"a\"==\"a\"", "true")]
-    [InlineData(43, "\"a\"!=\"a\"", "false")]
-    [InlineData(44, "\"a\"==\"b\"", "false")]
-    [InlineData(45, "\"a\"!=\"b\"", "true")]
-    [InlineData(46, "true==true", "true")]
-    [InlineData(47, "true!=true", "false")]
-    [InlineData(48, "false==false", "true")]
-    [InlineData(49, "false!=false", "false")]
-    [InlineData(50, "1 == (2*3)", "false")]
-    public void Must_Parse_Expressions(
+    public void Must_Parse_Expressions_With_Order(
 #pragma warning disable xUnit1026
         int order,
 #pragma warning restore xUnit1026
+        string expression,
+        string expectedResult)
+    {
+        var lexer = new Lexer(expression);
+        var tokens = lexer.ExtractTokens();
+
+        var syntaxParser = new SyntaxParser(_expressionResults, tokens);
+        var result = syntaxParser.Evaluate();
+
+        if (expectedResult == "\0")
+            Assert.Empty(result);
+        else
+            Assert.Equal(expectedResult, result[0].Value.ToString());
+    }
+
+    [Theory]
+    [InlineData("\"A\" * 3", "AAA")]
+    [InlineData("3 * \"A\"", "AAA")]
+    [InlineData("\"A\" + 3", "A3")]
+    [InlineData("3 + \"A\" //esse comentário", "3A")]
+    [InlineData("//este é um comentário", "\0")]
+    [InlineData("string texto = \"Esse texto tem // barras\"", "Esse texto tem // barras")]
+    [InlineData("1==1", "true")]
+    [InlineData("1!=1", "false")]
+    [InlineData("\"a\"==\"a\"", "true")]
+    [InlineData("\"a\"!=\"a\"", "false")]
+    [InlineData("\"a\"==\"b\"", "false")]
+    [InlineData("\"a\"!=\"b\"", "true")]
+    [InlineData("true==true", "true")]
+    [InlineData("true!=true", "false")]
+    [InlineData("false==false", "true")]
+    [InlineData("false!=false", "false")]
+    [InlineData("1 == (2*3)", "false")]
+    [InlineData("4 == pow(2)", "true")]
+    [InlineData("3 == (pow(2) - 1)", "true")]
+    [InlineData("4 == (pow(2) - 1)", "false")]
+    public void Must_Parse_Expressions(
         string expression,
         string expectedResult)
     {
@@ -113,6 +133,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
     [InlineData("1 == \"abcd\"", "Cannot apply Equal operator to different types: Double and String")]
     [InlineData("1 != \"abcd\"", "Cannot apply NotEqual operator to different types: Double and String")]
+    [InlineData("3 == pow(2) - 1", "Can't convert false to double")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
         string exceptionMessage)
