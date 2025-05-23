@@ -48,24 +48,20 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     private Identifier EvaluateComparison()
     {
         var left = EvaluatePlusOrMinus();
-        while (Token.IsMathOperatorType(CurrentToken.Type))
-        {
-            var op = NextIfTokenIs(CurrentToken.Type);
-            var right = EvaluatePlusOrMinus();
-            left = EvaluateComparison(left, right, op);
-        }
+        if (!Token.IsMathOperatorType(CurrentToken.Type)) return left;
+        var @operator = NextIfTokenIs(CurrentToken.Type);
+        var right = EvaluatePlusOrMinus();
+        left = EvaluateComparison(left, right, @operator);
         return left;
     }
 
     private Identifier EvaluatePlusOrMinus()
     {
         var left = EvaluateMultiplyOrDivide();
-        while (CurrentToken.Type is TokenType.Plus or TokenType.Minus)
-        {
-            var op = NextIfTokenIs(CurrentToken.Type);
-            var right = EvaluateMultiplyOrDivide();
-            left = EvaluateOperation(left, right, op);
-        }
+        if (CurrentToken.Type is not (TokenType.Plus or TokenType.Minus)) return left;
+        var @operator = NextIfTokenIs(CurrentToken.Type);
+        var right = EvaluateMultiplyOrDivide();
+        left = EvaluateOperation(left, right, @operator);
         return left;
     }
 
@@ -78,6 +74,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             var right = EvaluateToken();
             left = EvaluateOperation(left, right, op);
         }
+
         return left;
     }
 
@@ -194,10 +191,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         if (left.DataType == DataTypes.String || right.DataType == DataTypes.String)
             return EvaluateStringOperation(left, right, @operator);
 
-        if (left.DataType == DataTypes.Double ||
-            right.DataType == DataTypes.Double ||
-            left.DataType == DataTypes.Int ||
-            right.DataType == DataTypes.Int)
+        if (Identifier.AllAreNumberTypes(left.DataType, right.DataType))
             return EvaluateNumberOperation(left, right, @operator);
 
         throw new Exception($"Unexpected token: {@operator.Type}");

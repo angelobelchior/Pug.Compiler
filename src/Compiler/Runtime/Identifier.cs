@@ -32,7 +32,7 @@ public class Identifier(DataTypes dataType, object value)
         {
             DataTypes.Int => ToInt(),
             DataTypes.Double => ToDouble().ToString(CultureInfo.InvariantCulture),
-            DataTypes.Bool => ToBool().ToString().ToLower(),
+            DataTypes.Bool => ToBool().ToString(),
             DataTypes.String => ToString(),
             DataTypes.None => Identifier.None,
             _ => throw new Exception($"Invalid data type: {DataType}")
