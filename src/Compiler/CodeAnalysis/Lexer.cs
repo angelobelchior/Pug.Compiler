@@ -28,7 +28,7 @@ public class Lexer
                 IgnoreWhitespace();
                 continue;
             }
-            
+
             if (_currentChar == Token.DIVIDER && Peek() == Token.DIVIDER)
             {
                 IgnoreComment();
@@ -47,7 +47,7 @@ public class Lexer
                 continue;
             }
 
-            if (_currentChar == Token.EQUAL)
+            if (_currentChar == Token.EQUAL && Peek() != Token.EQUAL)
             {
                 tokens.Add(Token.Assign(_currentPosition));
                 Next();
@@ -81,6 +81,18 @@ public class Lexer
         if (identifier.Value is Token.TRUE or Token.FALSE)
             return Token.Bool(position, identifier.Value);
 
+        if (identifier.Value == Token.IF)
+            return Token.If(position);
+
+        if (identifier.Value == Token.THEN)
+            return Token.Then(position);
+
+        if (identifier.Value == Token.ELSE)
+            return Token.Else(position);
+
+        if (identifier.Value == Token.END)
+            return Token.End(position);
+
         return Token.Identifier(position, identifier.Value);
     }
 
@@ -106,6 +118,55 @@ public class Lexer
 
     private Token ExtractSymbols()
     {
+        if (_currentChar == Token.AMPERSAND && Peek() == Token.AMPERSAND)
+        {
+            var pos = _currentPosition;
+            Next(2);
+            return Token.And(pos);
+        }
+        if (_currentChar == Token.PIPE && Peek() == Token.PIPE)
+        {
+            var pos = _currentPosition;
+            Next(2);
+            return Token.Or(pos);
+        }
+        if (_currentChar == Token.EQUAL && Peek() == Token.EQUAL)
+        {
+            var pos = _currentPosition;
+            Next(2);
+            return Token.Equal(pos);
+        }
+        if (_currentChar == Token.NOT && Peek() == Token.EQUAL)
+        {
+            var pos = _currentPosition;
+            Next(2); 
+            return Token.NotEqual(pos);
+        }
+        if (_currentChar == Token.GREATER && Peek() == Token.EQUAL)
+        {
+            var pos = _currentPosition;
+            Next(2);
+            return Token.GreaterOrEqual(pos);
+        }
+        if (_currentChar == Token.LESS && Peek() == Token.EQUAL)
+        {
+            var pos = _currentPosition;
+            Next(2);
+            return Token.LessOrEqual(pos);
+        }
+        if (_currentChar == Token.GREATER)
+        {
+            var pos = _currentPosition;
+            Next();
+            return Token.Greater(pos);
+        }
+        if (_currentChar == Token.LESS)
+        {
+            var pos = _currentPosition;
+            Next();
+            return Token.Less(pos);
+        }
+        
         var position = _currentPosition;
         var token = _currentChar switch
         {
@@ -175,9 +236,9 @@ public class Lexer
         return position < _text.Length ? _text[position] : Token.END_OF_FILE;
     }
 
-    private void Next()
+    private void Next(int count = 1)
     {
-        _currentPosition++;
+        _currentPosition += count;
         _currentChar = _currentPosition < _text.Length ? _text[_currentPosition] : Token.END_OF_FILE;
     }
 
@@ -186,7 +247,7 @@ public class Lexer
         while (char.IsWhiteSpace(_currentChar))
             Next();
     }
-    
+
     private void IgnoreComment()
     {
         while (_currentChar != Token.NEW_LINE && _currentChar != Token.END_OF_FILE)

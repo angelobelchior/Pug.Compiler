@@ -48,13 +48,28 @@
                                         tokenizer: {
                                             root: [
                                                 [/\/\/.*/, 'comment'],
-                                                [/\b(int|double|string|bool|true|false|func|if|else|end|then|print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear)\b/, 'keyword'],
-                                                [/\b(int|string)\b/, 'type'],
-                                                [/\b(==|=|\+|-|\*|\/|==)\b/, 'operator'],
+                                                [/\b(print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear)\b/, 'function'],
+                                                [/\b(true|false|func|if|else|end|then)\b/, 'keyword'],
+                                                [/\b(int|string|double|bool)\b/, 'type'],
+                                                [/\b(==|=|\+|-|\*|\/|&&|\|\|)\b/, 'operator'],
                                                 [/\b\d+\b/, 'number'],
                                                 [/"([^"\\]|\\.)*"/, 'string'],
                                                 [/[a-zA-Z_][a-zA-Z0-9_]*/, 'identifier']
                                             ]
+                                        }
+                                    });
+
+                                    monaco.editor.defineTheme('pug-dark', {
+                                        base: 'vs-dark',
+                                        inherit: true,
+                                        rules: [
+                                            { token: 'function', foreground: '6fA076' },
+                                            { token: 'keyword', foreground: '569CD6' },
+                                            { token: 'type', foreground: '569CD6' },
+                                        ],
+                                        colors: {
+                                            'editor.foreground': '#FFFFFF',
+                                            'editor.background': '#1E1E1E'
                                         }
                                     });
 
@@ -77,10 +92,12 @@
                                         }
                                     });
 
+                                    
+
                                     const editor = monaco.editor.create(document.getElementById('container'), {
                                         value: `@Html.Raw(Model.Code)`,
                                         language: 'pug-lang',
-                                        theme: 'vs-dark',
+                                        theme: 'pug-dark',
                                         fontSize: 16
                                     });
 
@@ -111,7 +128,7 @@
                             }
                         </ul>
                     </div>
-                    
+
                     <div class="row">
                         <h5>Identifiers</h5>
                         <ul class="list-group">

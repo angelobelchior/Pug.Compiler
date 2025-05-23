@@ -28,12 +28,14 @@ public enum TokenType
     Then,
     Else,
     End,
+    
     Equal,
     NotEqual,
     Greater,
     Less,
     GreaterOrEqual,
     LessOrEqual,
+    
     And,
     Or,
 }
