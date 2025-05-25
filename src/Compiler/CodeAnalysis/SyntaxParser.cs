@@ -16,6 +16,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             var identifier = EvaluateExpression();
             results.Add(identifier);
         }
+
         return results;
     }
 
