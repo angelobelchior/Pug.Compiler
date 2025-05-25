@@ -16,7 +16,6 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             var identifier = EvaluateExpression();
             results.Add(identifier);
         }
-
         return results;
     }
 
@@ -89,7 +88,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             TokenType.String => EvaluateString(),
             TokenType.Bool => EvaluateBool(),
             TokenType.OpenParenthesis => EvaluateParenthesis(),
-            _ => throw new Exception($"Unexpected token in EvaluateToken: {CurrentToken.Type}")
+            _ => throw new Exception($"Unexpected token {CurrentToken.Type} at position {CurrentToken.Position}")
         };
 
     private Identifier EvaluateDataType()

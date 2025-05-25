@@ -1,5 +1,3 @@
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Pug.Compiler.CodeAnalysis;
 using Pug.Compiler.Runtime;

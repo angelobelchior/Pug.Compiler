@@ -71,7 +71,7 @@ public static class BuiltInFunctions
             return Identifier.None;
         },
         
-        ["clear"] = args =>
+        ["clear"] = _ =>
         {
             Console.Clear();
 

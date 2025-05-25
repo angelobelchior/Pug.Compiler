@@ -120,7 +120,7 @@ public class Lexer
     {
         var position = _currentPosition;
 
-        var doubleCharToken = (currentChar: _currentChar, nextChar: Peek()) switch
+        var doubleCharToken = (_currentChar, Peek()) switch
         {
             (Token.AMPERSAND, Token.AMPERSAND) => Token.And(position),
             (Token.PIPE, Token.PIPE) => Token.Or(position),
