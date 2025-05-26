@@ -48,6 +48,8 @@ E como podemos ver nos exemplos abaixo, é possível passar expressões matemát
 4
 > random(5)
 3
+> ihuuuu(pow(2,4))
+Unknown identifier: ihuuuu
 ```  
 ----
 
