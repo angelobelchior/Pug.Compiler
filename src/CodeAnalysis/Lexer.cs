@@ -29,6 +29,12 @@ public class Lexer
                 IgnoreWhitespace();
                 continue;
             }
+            
+            if (char.IsLetter(_currentChar))
+            {
+                tokens.Add(ExtractFunction());
+                continue;
+            }
 
             if (_currentChar == '-' && char.IsDigit(Peek()))
             {
@@ -50,6 +56,7 @@ public class Lexer
                 '/' => Token.Divide(_currentPosition),
                 '(' => Token.OpenParenthesis(_currentPosition),
                 ')' => Token.CloseParenthesis(_currentPosition),
+                ',' => Token.Comma(_currentPosition),
                 _ => throw new Exception($"Unexpected character: {_currentChar}")
             };
             tokens.Add(token);
@@ -88,6 +95,18 @@ public class Lexer
 
         var value = result.ToString();
         return Token.Number(_currentPosition, value);
+    }
+    
+    private Token ExtractFunction()
+    {
+        var result = new StringBuilder();
+        while (char.IsLetter(_currentChar))
+        {
+            result.Append(_currentChar);
+            Next();
+        }
+        var value = result.ToString();
+        return Token.Function(_currentPosition, value);
     }
 
     private char Peek()
