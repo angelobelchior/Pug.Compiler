@@ -43,7 +43,7 @@ E como podemos ver nos exemplos abaixo, é possível passar expressões matemát
 > round(12.35, 1)
 12.4
 > random()
-0.43447518061452317
+18
 > random(1, 10)
 4
 > random(5)
