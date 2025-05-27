@@ -174,6 +174,6 @@ public class LexerTests
         var lexer = new Lexer("@");
 
         var exception = Assert.Throws<Exception>(() => lexer.ExtractTokens());
-        Assert.Equal($"Unexpected character @ at position 0", exception.Message);
+        Assert.Equal($"Unexpected character @", exception.Message);
     }
 }

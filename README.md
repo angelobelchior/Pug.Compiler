@@ -1,5 +1,7 @@
 # Pug.Compiler
 
+[![.NET](https://github.com/angelobelchior/Pug.Compiler/actions/workflows/dotnet.yml/badge.svg)](https://github.com/angelobelchior/Pug.Compiler/actions/workflows/dotnet.yml)
+
 Esse repositório faz parte da série [Reinventando a Roda: Criando um compilador em csharp](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-1-2gih) na qual vamos construir um compilador do zero em **csharp**.
 
 Essa construção será dividida em partes e cada parte terá um post e uma branch específica.

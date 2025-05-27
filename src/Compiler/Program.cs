@@ -33,8 +33,7 @@ while (true)
             continue;
         }
 
-        if (string.IsNullOrEmpty(line))
-            break;
+        if (string.IsNullOrEmpty(line)) break;
 
         var lexer = new Lexer(line);
         var tokens = lexer.ExtractTokens();
@@ -45,15 +44,16 @@ while (true)
         var syntaxParser = new SyntaxParser(identifiers, tokens);
         var results = syntaxParser.Evaluate();
 
-        foreach (var result in results)
-            if (result.DataType != DataTypes.None)
-                WriteLine(result.Value, ConsoleColor.Blue);
+        foreach (var result in results.Where(result => result.DataType != DataTypes.None))
+            WriteLine(result.Value, ConsoleColor.Blue);
     }
     catch (Exception ex)
     {
         WriteLine(ex.Message, ConsoleColor.Red);
     }
 }
+
+return;
 
 static void WriteLine(object message, ConsoleColor color)
 {

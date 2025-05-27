@@ -21,9 +21,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     }
 
     private Identifier EvaluateExpression()
-    {
-        return EvaluateLogicalOr();
-    }
+        => EvaluateLogicalOr();
 
     private Identifier EvaluateLogicalOr()
     {
@@ -89,7 +87,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             TokenType.String => EvaluateString(),
             TokenType.Bool => EvaluateBool(),
             TokenType.OpenParenthesis => EvaluateParenthesis(),
-            _ => throw new Exception($"Unexpected token {CurrentToken.Type} at position {CurrentToken.Position}")
+            _ => throw new Exception($"Unexpected token {CurrentToken.Type}")
         };
 
     private Identifier EvaluateDataType()
@@ -155,7 +153,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         var result = EvaluateToken();
         var value = token.Type == TokenType.Minus
             ? -result.ToDouble()
-            : result.ToDouble();
+            : +result.ToDouble();
 
         return new Identifier(result.DataType, value);
     }
@@ -266,6 +264,8 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
     private static Identifier EvaluateComparison(Identifier left, Identifier right, Token @operator)
     {
+        const double epsilon = 1e-6;
+
         Identifier.EnsureSameTypes(left, right, @operator);
 
         var result = @operator.Type switch
@@ -282,55 +282,49 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         return new Identifier(DataTypes.Bool, result);
 
         bool Equal()
-        {
-            if (left.DataType == DataTypes.String || right.DataType == DataTypes.String)
-                return left.ToString() == right.ToString();
+            => (left.DataType, right.DataType) switch
+            {
+                (DataTypes.Double, _) or (_, DataTypes.Double) =>
+                    Math.Abs(left.ToDouble() - right.ToDouble()) < epsilon,
 
-            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Double)
-                return Math.Abs(left.ToDouble() - right.ToDouble()) < 0.01;
+                (DataTypes.Int, DataTypes.Int) =>
+                    left.ToInt() == right.ToInt(),
 
-            if (left.DataType == DataTypes.Int || right.DataType == DataTypes.Int)
-                return left.ToInt() == right.ToInt();
+                (DataTypes.Bool, DataTypes.Bool) =>
+                    left.ToBool() == right.ToBool(),
 
-            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Int)
-                return Math.Abs(left.ToDouble() - right.ToInt()) < 0.01;
+                (DataTypes.String, DataTypes.String) =>
+                    left.ToString() == right.ToString(),
 
-            if (left.DataType == DataTypes.Int || right.DataType == DataTypes.Double)
-                return Math.Abs(left.ToInt() - right.ToDouble()) < 0.01;
-
-            if (left.DataType == DataTypes.Bool || right.DataType == DataTypes.Bool)
-                return left.ToBool() == right.ToBool();
-
-            return left.ToString() == right.ToString();
-        }
+                _ => ThrowException()
+            };
 
         bool Greater()
-        {
-            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Double)
-                return left.ToDouble() > right.ToDouble();
+            => (left.DataType, right.DataType) switch
+            {
+                (DataTypes.Double, _) or (_, DataTypes.Double) =>
+                    left.ToDouble() > right.ToDouble(),
 
-            if (left.DataType == DataTypes.Int || right.DataType == DataTypes.Int)
-                return left.ToInt() > right.ToInt();
+                (DataTypes.Int, DataTypes.Int) =>
+                    left.ToInt() > right.ToInt(),
 
-            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Int)
-                return left.ToDouble() > right.ToInt();
-
-            return left.ToInt() > right.ToDouble();
-        }
+                _ => ThrowException()
+            };
 
         bool Less()
-        {
-            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Double)
-                return left.ToDouble() < right.ToDouble();
+            => (left.DataType, right.DataType) switch
+            {
+                (DataTypes.Double, _) or (_, DataTypes.Double) =>
+                    left.ToDouble() < right.ToDouble(),
 
-            if (left.DataType == DataTypes.Int || right.DataType == DataTypes.Int)
-                return left.ToInt() < right.ToInt();
+                (DataTypes.Int, DataTypes.Int) =>
+                    left.ToInt() < right.ToInt(),
 
-            if (left.DataType == DataTypes.Double || right.DataType == DataTypes.Int)
-                return left.ToDouble() < right.ToInt();
+                _ => ThrowException()
+            };
 
-            return left.ToInt() < right.ToDouble();
-        }
+        bool ThrowException()
+            => throw new Exception($"Cannot compare types: {left.DataType} and {right.DataType}");
     }
 
     private static Identifier EvaluateLogicalOperation(Identifier left, Identifier right, Token @operator)

@@ -156,7 +156,7 @@ public class Lexer
             return tokenFactory(position);
         }
 
-        throw new Exception($"Unexpected character {_currentChar} at position {position}");
+        throw new Exception($"Unexpected character {_currentChar}");
     }
 
     private Token ExtractNumber()

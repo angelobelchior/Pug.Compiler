@@ -32,7 +32,7 @@ public static class BuiltInFunctions
 
         ["random"] = args => args.Count switch
         {
-            0 => Identifier.Create(DataTypes.Double, Random.Shared.NextDouble()),
+            0 => Identifier.Create(DataTypes.Double, Random.Shared.Next()),
             1 => Identifier.Create(DataTypes.Double, Random.Shared.Next(args[0].ToInt())),
             2 => Identifier.Create(DataTypes.Double, Random.Shared.Next(args[0].ToInt(), args[1].ToInt())),
             _ => throw new Exception("Invalid number of arguments for random")
