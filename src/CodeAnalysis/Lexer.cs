@@ -1,4 +1,5 @@
 using System.Text;
+using Pug.Compiler.Runtime;
 
 namespace Pug.Compiler.CodeAnalysis;
 
@@ -9,79 +10,128 @@ public class Lexer
     private int _currentPosition;
     private char _currentChar;
 
-    private const char EOF = '\0';
-
     public Lexer(string text)
     {
         _text = text;
         _currentPosition = 0;
-        _currentChar = _text.Length > 0 ? _text[_currentPosition] : EOF;
+        _currentChar = _text.Length > 0 ? _text[_currentPosition] : Token.EOF;
     }
 
-    public List<Token> CreateTokens()
+    public List<Token> ExtractTokens()
     {
         var tokens = new List<Token>();
 
-        while (_currentChar != EOF)
+        while (_currentChar != Token.EOF)
         {
             if (char.IsWhiteSpace(_currentChar))
             {
                 IgnoreWhitespace();
                 continue;
             }
-            
+
             if (char.IsLetter(_currentChar))
             {
-                tokens.Add(ExtractFunction());
+                tokens.Add(ExtractKeyword());
                 continue;
             }
 
-            if (_currentChar == '-' && char.IsDigit(Peek()))
+            if (_currentChar == Token.QUOTE)
+            {
+                tokens.Add(ExtractString());
+                continue;
+            }
+
+            if (_currentChar == Token.ASSIGN)
+            {
+                tokens.Add(Token.Assign(_currentPosition));
+                Next();
+                continue;
+            }
+
+            if (_currentChar == Token.MINUS && char.IsDigit(Peek()) || char.IsDigit(_currentChar))
             {
                 tokens.Add(ExtractNumber());
                 continue;
             }
 
-            if (char.IsDigit(_currentChar))
-            {
-                tokens.Add(ExtractNumber());
-                continue;
-            }
+            tokens.Add(ExtractSymbols());
+        }
 
-            var token = _currentChar switch
-            {
-                '+' => Token.Plus(_currentPosition),
-                '-' => Token.Minus(_currentPosition),
-                '*' => Token.Multiply(_currentPosition),
-                '/' => Token.Divide(_currentPosition),
-                '(' => Token.OpenParenthesis(_currentPosition),
-                ')' => Token.CloseParenthesis(_currentPosition),
-                ',' => Token.Comma(_currentPosition),
-                _ => throw new Exception($"Unexpected character: {_currentChar}")
-            };
-            tokens.Add(token);
+        tokens.Add(Token.EndOfFile(_currentPosition));
+        return tokens;
+    }
 
+    private Token ExtractKeyword()
+    {
+        var position = _currentPosition;
+        var identifier = ExtractIdentifier();
+
+        if (Identifier.ContainsDataType(identifier.Value))
+            return Token.DataType(position, identifier.Value);
+
+        if (BuiltInFunctions.Contains(identifier.Value))
+            return Token.Function(position, identifier.Value);
+
+        if (identifier.Value is Token.TRUE or Token.FALSE)
+            return Token.Bool(position, identifier.Value);
+
+        return Token.Identifier(position, identifier.Value);
+    }
+
+    private Token ExtractString()
+    {
+        var position = _currentPosition;
+
+        Next();
+        var stringValue = new StringBuilder();
+
+        while (_currentChar != Token.QUOTE && _currentChar != Token.EOF)
+        {
+            stringValue.Append(_currentChar);
             Next();
         }
 
-        tokens.Add(new Token(TokenType.EOF, string.Empty, _currentPosition));
-        return tokens;
+        if (_currentChar != Token.QUOTE)
+            throw new Exception("String not closed");
+
+        Next();
+        return Token.String(position, stringValue.ToString());
+    }
+
+    private Token ExtractSymbols()
+    {
+        var position = _currentPosition;
+        var token = _currentChar switch
+        {
+            Token.PLUS => Token.Plus(position),
+            Token.MINUS => Token.Minus(position),
+            Token.MULTIPLY => Token.Multiply(position),
+            Token.DIVIDER => Token.Divide(_currentPosition),
+            Token.OPEN_PARENTHESIS => Token.OpenParenthesis(position),
+            Token.CLOSE_PARENTHESIS => Token.CloseParenthesis(position),
+            Token.COMMA => Token.Comma(position),
+            _ => throw new Exception($"Unexpected character {_currentChar} at position {position}")
+        };
+
+        Next();
+        return token;
     }
 
     private Token ExtractNumber()
     {
-        var result = new StringBuilder();
+        var position = _currentPosition;
+        var number = new StringBuilder();
+        var hasDot = false;
 
-        if (_currentChar == '-')
+        if (_currentChar == Token.MINUS)
         {
-            result.Append('-');
+            number.Append(Token.MINUS);
             Next();
         }
 
-        var hasDot = false;
-        while (char.IsDigit(_currentChar) || _currentChar == '.')
+        while (char.IsDigit(_currentChar) || _currentChar == Token.DOT)
         {
-            if (_currentChar == '.')
+            if (_currentChar == Token.DOT)
             {
                 if (hasDot)
                     throw new Exception("Invalid number format: multiple dots");
@@ -89,36 +139,40 @@ public class Lexer
                 hasDot = true;
             }
 
-            result.Append(_currentChar);
+            number.Append(_currentChar);
             Next();
         }
 
-        var value = result.ToString();
-        return Token.Number(_currentPosition, value);
+        if (hasDot && !double.TryParse(number.ToString(), out _))
+            throw new Exception($"Invalid number format: {number}");
+
+        return Token.Number(position, number.ToString());
     }
-    
-    private Token ExtractFunction()
+
+    private Token ExtractIdentifier()
     {
+        var position = _currentPosition;
         var result = new StringBuilder();
+
         while (char.IsLetter(_currentChar))
         {
             result.Append(_currentChar);
             Next();
         }
-        var value = result.ToString();
-        return Token.Function(_currentPosition, value);
+
+        return Token.Identifier(position, result.ToString());
     }
 
     private char Peek()
     {
-        var peekPos = _currentPosition + 1;
-        return peekPos < _text.Length ? _text[peekPos] : EOF;
+        var position = _currentPosition + 1;
+        return position < _text.Length ? _text[position] : Token.EOF;
     }
 
     private void Next()
     {
         _currentPosition++;
-        _currentChar = _currentPosition < _text.Length ? _text[_currentPosition] : EOF;
+        _currentChar = _currentPosition < _text.Length ? _text[_currentPosition] : Token.EOF;
     }
 
     private void IgnoreWhitespace()

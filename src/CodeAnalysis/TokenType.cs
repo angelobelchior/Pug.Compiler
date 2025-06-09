@@ -2,18 +2,25 @@ namespace Pug.Compiler.CodeAnalysis;
 
 public enum TokenType
 {
-    EOF,
+    EndOfFile,
     
     Number,
+    Bool,
+    String,
     
     Plus,
     Minus,
     Multiply,
     Divide,
     
+    Assign,
+    
     OpenParenthesis,
     CloseParenthesis,
     
     Function,
-    Comma
+    Comma,
+    
+    Identifier,
+    DataType
 }

@@ -1,154 +1,238 @@
+using System.Text;
+using Pug.Compiler.Runtime;
+
 namespace Pug.Compiler.CodeAnalysis;
 
-public class SyntaxParser(List<Token> tokens)
+public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token> tokens)
 {
     private Token CurrentToken => tokens[_currentPosition];
-
     private int _currentPosition;
 
-    public double Parse()
+    public Identifier Evaluate()
+        => EvaluateExpression();
+
+    private Identifier EvaluateExpression()
     {
-        var result = EvaluateExpressionWithPriority();
+        var left = EvaluateExpressionWithPriority();
 
         while (CurrentToken.Type is TokenType.Plus or TokenType.Minus)
         {
-            if (CurrentToken.Type == TokenType.Plus)
-            {
-                NextIfTokenIs(TokenType.Plus);
-                result += EvaluateExpressionWithPriority();
-            }
-            else if (CurrentToken.Type == TokenType.Minus)
-            {
-                NextIfTokenIs(TokenType.Minus);
-                result -= EvaluateExpressionWithPriority();
-            }
+            var @operator = NextIfTokenIs(CurrentToken.Type);
+            var right = EvaluateExpressionWithPriority();
+
+            left = EvaluateOperation(left, right, @operator);
         }
 
-        return result;
+        return left;
     }
 
-    private double EvaluateExpressionWithPriority()
+    private Identifier EvaluateExpressionWithPriority()
     {
-        var result = EvaluateToken();
+        var left = EvaluateToken();
 
         while (CurrentToken.Type is TokenType.Multiply or TokenType.Divide)
         {
-            if (CurrentToken.Type == TokenType.Multiply)
+            var @operator = NextIfTokenIs(CurrentToken.Type);
+            var right = EvaluateToken();
+            left = EvaluateOperation(left, right, @operator);
+        }
+
+        return left;
+    }
+
+    private Identifier EvaluateToken()
+        => CurrentToken.Type switch
+        {
+            TokenType.DataType => EvaluateDataType(),
+            TokenType.Identifier => EvaluateIdentifier(),
+            TokenType.Function => EvaluateFunction(),
+            TokenType.Plus or TokenType.Minus => EvaluateSignal(),
+            TokenType.Number => EvaluateNumber(),
+            TokenType.String => EvaluateString(),
+            TokenType.Bool => EvaluateBool(),
+            TokenType.OpenParenthesis => EvaluateParenthesis(),
+            _ => throw new Exception($"Unexpected token in EvaluateToken: {CurrentToken.Type}")
+        };
+
+    private Identifier EvaluateDataType()
+    {
+        var dataTypeToken = NextIfTokenIs(TokenType.DataType);
+        if (!Identifier.ContainsDataType(dataTypeToken.Value))
+            throw new Exception($"Unknown type: {dataTypeToken.Value}");
+
+        var checkNext = Peek();
+
+        var name = NextIfTokenIs(TokenType.Identifier).Value;
+        var identifier = Identifier.Default(dataTypeToken.Value);
+        identifiers[name] = identifier;
+
+        if (checkNext.Type != TokenType.Assign)
+            return identifier;
+
+        NextIfTokenIs(TokenType.Assign);
+        var value = EvaluateExpression();
+        identifier = value.Cast(dataTypeToken.Value);
+
+        identifiers[name] = identifier;
+        return identifier;
+    }
+
+    private Identifier EvaluateIdentifier()
+    {
+        var checkNext = Peek();
+        if (CurrentToken.Type == TokenType.Identifier && checkNext.Type == TokenType.Assign)
+            return EvaluateAssignment();
+
+        var token = NextIfTokenIs(TokenType.Identifier);
+
+        if (!identifiers.TryGetValue(token.Value, out var identifier))
+            throw new Exception($"Unknown identifier: {token.Value}");
+
+        return identifier;
+    }
+
+    private Identifier EvaluateFunction()
+    {
+        var token = NextIfTokenIs(TokenType.Function);
+        NextIfTokenIs(TokenType.OpenParenthesis);
+
+        var args = new List<Identifier>();
+        if (CurrentToken.Type != TokenType.CloseParenthesis)
+        {
+            args.Add(EvaluateExpression());
+            while (CurrentToken.Type == TokenType.Comma)
             {
-                NextIfTokenIs(TokenType.Multiply);
-                result *= EvaluateToken();
-            }
-            else if (CurrentToken.Type == TokenType.Divide)
-            {
-                NextIfTokenIs(TokenType.Divide);
-                result /= EvaluateToken();
+                NextIfTokenIs(TokenType.Comma);
+                args.Add(EvaluateExpression());
             }
         }
 
+        NextIfTokenIs(TokenType.CloseParenthesis);
+        return BuiltInFunctions.Invoke(token, args);
+    }
+
+    private Identifier EvaluateSignal()
+    {
+        var token = NextIfTokenIs(CurrentToken.Type);
+        var result = EvaluateToken();
+        var value = token.Type == TokenType.Minus 
+            ? -result.AsDouble() 
+            : result.AsDouble();
+        
+        return new Identifier(result.DataType, value);
+    }
+
+    private Identifier EvaluateNumber()
+    {
+        var token = NextIfTokenIs(TokenType.Number);
+        return Identifier.FromToken(token);
+    }
+
+    private Identifier EvaluateString()
+    {
+        var token = NextIfTokenIs(TokenType.String);
+        return new Identifier(DataTypes.String, token.Value);
+    }
+
+    private Identifier EvaluateBool()
+    {
+        var token = NextIfTokenIs(TokenType.Bool);
+        return new Identifier(DataTypes.Bool, token.Value);
+    }
+
+    private Identifier EvaluateParenthesis()
+    {
+        NextIfTokenIs(TokenType.OpenParenthesis);
+        var result = EvaluateExpression();
+        NextIfTokenIs(TokenType.CloseParenthesis);
         return result;
     }
-
-    private double EvaluateToken()
+    
+    private static Identifier EvaluateOperation(Identifier left, Identifier right, Token @operator)
     {
-        var token = CurrentToken;
-        
-        if (token.Type == TokenType.Function)
+        switch (left.DataType)
         {
-            NextIfTokenIs(TokenType.Function);
-            NextIfTokenIs(TokenType.OpenParenthesis);
-
-            var args = new List<double>();
-
-            if (CurrentToken.Type != TokenType.CloseParenthesis)
-            {
-                args.Add(Parse());
-
-                while (CurrentToken.Type == TokenType.Comma)
-                {
-                    NextIfTokenIs(TokenType.Comma);
-                    args.Add(Parse());
-                }
-            }
-
-            NextIfTokenIs(TokenType.CloseParenthesis);
-
-            return InvokeMethod(token, args);
+            case DataTypes.String when right.DataType == DataTypes.String:
+            case DataTypes.String when right.DataType == DataTypes.Int && @operator.Type == TokenType.Multiply:
+            case DataTypes.String when right.DataType == DataTypes.Double && @operator.Type == TokenType.Multiply:
+                return EvaluateStringOperation(left, right, @operator);
+            case DataTypes.Int when right.DataType == DataTypes.String  && @operator.Type == TokenType.Multiply:
+            case DataTypes.Double when right.DataType == DataTypes.String  && @operator.Type == TokenType.Multiply:
+                return EvaluateStringOperation(right, left, @operator);
         }
 
-        if (token.Type == TokenType.Plus)
-        {
-            NextIfTokenIs(TokenType.Plus);
-            return EvaluateToken();
-        }
+        if (left.DataType == DataTypes.Double ||
+            right.DataType == DataTypes.Double ||
+            left.DataType == DataTypes.Int ||
+            right.DataType == DataTypes.Int)
+            return EvaluateNumberOperation(left, right, @operator);
 
-        if (token.Type == TokenType.Minus)
-        {
-            NextIfTokenIs(TokenType.Minus);
-            return -EvaluateToken();
-        }
-
-        if (token.Type == TokenType.Number)
-        {
-            NextIfTokenIs(TokenType.Number);
-            return double.Parse(token.Value, System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        if (token.Type == TokenType.OpenParenthesis)
-        {
-            NextIfTokenIs(TokenType.OpenParenthesis);
-            var result = Parse();
-            NextIfTokenIs(TokenType.CloseParenthesis);
-            return result;
-        }
-
-        throw new Exception($"Unexpected token in Evaluate Token: {token.Type}");
+        throw new Exception($"Unexpected token: {@operator.Type}");
     }
 
-    private void NextIfTokenIs(TokenType type)
+    private static Identifier EvaluateStringOperation(Identifier left, Identifier right,
+        Token @operator)
     {
-        if (CurrentToken.Type == type)
-            _currentPosition++;
-        else
+        var value = @operator.Type switch
+        {
+            TokenType.Plus => left.AsString() + right.AsString(),
+            TokenType.Minus => left.AsString().Replace(right.AsString(), string.Empty),
+            TokenType.Multiply => Multiply(left.AsString(), right.AsInt()),
+            _ => throw new Exception($"Unexpected token: {@operator.Type}")
+        };
+
+        return new Identifier(DataTypes.String, value);
+
+        static string Multiply(string @string, int count)
+        {
+            var result = new StringBuilder();
+            for (var i = 0; i < count; i++)
+                result.Append(@string);
+            return result.ToString();
+        }
+    }
+
+    private static Identifier EvaluateNumberOperation(Identifier left, Identifier right,
+        Token @operator)
+    {
+        var value = @operator.Type switch
+        {
+            TokenType.Plus => left.AsDouble() + right.AsDouble(),
+            TokenType.Minus => left.AsDouble() - right.AsDouble(),
+            TokenType.Multiply => left.AsDouble() * right.AsDouble(),
+            TokenType.Divide => left.AsDouble() / right.AsDouble(),
+            _ => throw new Exception($"Unexpected token: {@operator.Type}")
+        };
+
+        return new Identifier(DataTypes.Double, value);
+    }
+
+    private Identifier EvaluateAssignment()
+    {
+        var variableName = NextIfTokenIs(TokenType.Identifier).Value;
+        NextIfTokenIs(TokenType.Assign);
+        var value = EvaluateExpression();
+
+        if (!identifiers.ContainsKey(variableName))
+            throw new Exception($"Unknown identifier: {variableName}");
+
+        identifiers[variableName] = value;
+        return value;
+    }
+
+    private Token Peek()
+    {
+        var nextPosition = _currentPosition + 1;
+        return nextPosition < tokens.Count ? tokens[nextPosition] : tokens.Last();
+    }
+    
+    private Token NextIfTokenIs(TokenType type)
+    {
+        if (CurrentToken.Type != type)
             throw new Exception($"Unexpected token: {CurrentToken.Type}, expected: {type}");
+
+        var token = CurrentToken;
+        _currentPosition++;
+        return token;
     }
-
-    private static double InvokeMethod(Token token, List<double> args)
-    => token.Value.ToLower() switch
-    {
-        "sqrt" => args.Count == 1
-            ? Math.Sqrt(args[0])
-            : throw new Exception("Invalid number of arguments for sqrt"),
-
-        "pow" => args.Count switch
-        {
-            1 => Math.Pow(args[0], 2),
-            2 => Math.Pow(args[0], args[1]),
-            _ => throw new Exception("Invalid number of arguments for round")
-        },
-
-        "min" => args.Count == 2
-            ? Math.Min(args[0], args[1])
-            : throw new Exception("Invalid number of arguments for min"),
-        
-        "max" => args.Count == 2
-            ? Math.Max(args[0], args[1])
-            : throw new Exception("Invalid number of arguments for max"),
-
-        "round" => args.Count switch
-        {
-            1 => Math.Round(args[0]),
-            2 => Math.Round(args[0], Convert.ToInt32(args[1])),
-            _ => throw new Exception("Invalid number of arguments for round")
-        },
-
-        "random" => args.Count switch
-        {
-            0 => Random.Shared.NextDouble(),
-            1 => Random.Shared.Next(Convert.ToInt32(args[0])),
-            2 => Random.Shared.Next(Convert.ToInt32(args[0]), Convert.ToInt32(args[1])),
-            _ => throw new Exception("Invalid number of arguments for random")
-        },
-
-        _ => throw new Exception($"Unknown function: {token.Value}")
-    };
 }
