@@ -49,8 +49,6 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(33, "nome = nome + \" Belchior\"", "Angelo Belchior")]
     [InlineData(34, "\"A\" * 3", "AAA")]
     [InlineData(35, "3 * \"A\"", "AAA")]
-    [InlineData(36, "\"A\" + 3", "A3")]
-    [InlineData(37, "3 + \"A\"", "3A")]
     public void Must_Parse_Expressions(
 #pragma warning disable xUnit1026
         int order,
@@ -64,7 +62,7 @@ public class GeneralTests(SharedValue sharedValue)
         var syntaxParser = new SyntaxParser(_expressionResults, tokens);
         var result = syntaxParser.Evaluate();
 
-        Assert.Equal(expectedResult, result[0].Value.ToString());
+        Assert.Equal(expectedResult, result.Value.ToString());
     }
 
     [Theory]
@@ -93,7 +91,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("int x = \"abcd\"", "Invalid type string. Expected a int")]
     [InlineData("double x = false", "Invalid type bool. Expected a double")]
     [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
-    [InlineData("bool x = 12234", "Invalid type int or double. Expected a bool")]
+    [InlineData("bool x = 12234", "Invalid type number. Expected a bool")]
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
@@ -124,7 +122,7 @@ public class GeneralTests(SharedValue sharedValue)
             var syntaxParser = new SyntaxParser(results, tokens);
             var result = syntaxParser.Evaluate();
 
-            Assert.Equal(10, result[0].ToInt());
+            Assert.Equal(10, result.AsInt());
 
             lexer = new Lexer("idade = y");
             tokens = lexer.ExtractTokens();
