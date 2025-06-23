@@ -56,10 +56,12 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     private Identifier EvaluatePlusOrMinus()
     {
         var left = EvaluateMultiplyOrDivide();
-        if (CurrentToken.Type is not (TokenType.Plus or TokenType.Minus)) return left;
-        var @operator = NextIfTokenIs(CurrentToken.Type);
-        var right = EvaluateMultiplyOrDivide();
-        left = EvaluateOperation(left, right, @operator);
+        while (CurrentToken.Type is TokenType.Plus or TokenType.Minus)
+        {
+            var op = NextIfTokenIs(CurrentToken.Type);
+            var right = EvaluateMultiplyOrDivide();
+            left = EvaluateOperation(left, right, op);
+        }
         return left;
     }
 
@@ -133,7 +135,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         NextIfTokenIs(TokenType.OpenParenthesis);
 
         var args = new List<Identifier>();
-        if (CurrentToken.Type != TokenType.CloseParenthesis)
+        while (CurrentToken.Type != TokenType.CloseParenthesis)
         {
             args.Add(EvaluateExpression());
             while (CurrentToken.Type == TokenType.Comma)
