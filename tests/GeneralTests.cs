@@ -98,7 +98,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("true || false", "True")]
     [InlineData("false || false", "False")]
     [InlineData("false || true", "True")]
-    public void Must_Parse_Expressions(
+    public void Must_Parse_Operations(
         string expression,
         string expectedResult)
     {
@@ -140,7 +140,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("int x = \"abcd\"", "Invalid type string. Expected a int")]
     [InlineData("double x = false", "Invalid type bool. Expected a double")]
     [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
-    [InlineData("bool x = 12234", "Invalid type number. Expected a bool")]
+    [InlineData("bool x = 12234", "Invalid type int or double. Expected a bool")]
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
     [InlineData("1 == \"abcd\"", "Cannot apply Equal operator to different types: Double and String")]
     [InlineData("1 != \"abcd\"", "Cannot apply NotEqual operator to different types: Double and String")]
@@ -224,7 +224,7 @@ public class GeneralTests(SharedValue sharedValue)
             var syntaxParser = new SyntaxParser(results, tokens);
             var result = syntaxParser.Evaluate();
 
-            Assert.Equal(10, result.AsInt());
+            Assert.Equal(10, result[0].Value);
 
             lexer = new Lexer("idade = y");
             tokens = lexer.ExtractTokens();

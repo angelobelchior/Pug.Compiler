@@ -32,7 +32,7 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "nonexistent");
         var args = new List<Identifier>();
 
-        var exception = Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        var exception = Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
         Assert.Equal("Function nonexistent not found", exception.Message);
     }
 
@@ -42,10 +42,10 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "sqrt");
         var args = new List<Identifier> { Identifier.Create(DataTypes.Double, 16.0) };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal(4.0, result.AsDouble());
+        Assert.Equal(4.0, result.ToDouble());
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "sqrt");
         var args = new List<Identifier>();
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
 
     [Fact]
@@ -63,10 +63,10 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "pow");
         var args = new List<Identifier> { Identifier.Create(DataTypes.Double, 3.0) };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal(9.0, result.AsDouble());
+        Assert.Equal(9.0, result.ToDouble());
     }
 
     [Fact]
@@ -79,10 +79,10 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3.0)
         };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal(8.0, result.AsDouble());
+        Assert.Equal(8.0, result.ToDouble());
     }
     
     [Fact]
@@ -96,7 +96,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -109,10 +109,10 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3.0)
         };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal(2.0, result.AsDouble());
+        Assert.Equal(2.0, result.ToDouble());
     }
     
     [Fact]
@@ -126,7 +126,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -139,10 +139,10 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3.0)
         };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal(3.0, result.AsDouble());
+        Assert.Equal(3.0, result.ToDouble());
     }
     
     [Fact]
@@ -156,7 +156,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -165,10 +165,10 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "round");
         var args = new List<Identifier> { Identifier.Create(DataTypes.Double, 3.53) };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal(4, result.AsDouble());
+        Assert.Equal(4, result.ToDouble());
     }
 
     [Fact]
@@ -181,10 +181,10 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 2)
         };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal(3.53, result.AsDouble());
+        Assert.Equal(3.53, result.ToDouble());
     }
     
     [Fact]
@@ -198,7 +198,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -207,10 +207,10 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "random");
         var args = new List<Identifier>();
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.True(result.AsDouble() >= 0 || result.AsDouble() <= 0); // ;p
+        Assert.True(result.ToDouble() >= 0 || result.ToDouble() <= 0); // ;p
         
     }
     
@@ -223,10 +223,10 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Int, 2),
         };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.True(result.AsDouble() >= 0 && result.AsDouble() < 2);
+        Assert.True(result.ToDouble() >= 0 && result.ToDouble() < 2);
     }
 
     [Fact]
@@ -239,10 +239,10 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Int, 3)
         };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.True(result.AsDouble() >= 2 && result.AsDouble() < 3);
+        Assert.True(result.ToDouble() >= 2 && result.ToDouble() < 3);
     }
     
     [Fact]
@@ -256,7 +256,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -268,10 +268,10 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.String, "Angelo")
         };
 
-        var result = BuiltInFunctions.Invoke(token, args);
+        var result = BuiltInFunctions.Invoke(token.Value, args);
 
         Assert.Equal(DataTypes.Int, result.DataType);
-        Assert.Equal(6, result.AsInt());
+        Assert.Equal(6, result.ToInt());
     }
     
     [Fact]
@@ -285,7 +285,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -294,7 +294,7 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "print");
         var args = new List<Identifier> { Identifier.Create(DataTypes.String, "Hello, World!") };
 
-        var exception = Record.Exception(() => BuiltInFunctions.Invoke(token, args));
+        var exception = Record.Exception(() => BuiltInFunctions.Invoke(token.Value, args));
 
         Assert.Null(exception);
     }
@@ -310,6 +310,6 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token, args));
+        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
 }
