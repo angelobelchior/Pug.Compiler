@@ -39,11 +39,11 @@ public static class BuiltInFunctions
         },
         
         ["upper"] = args => args.Count == 1
-            ? Identifier.Create(DataTypes.Int, args[0].ToString().ToUpperInvariant())
+            ? Identifier.Create(DataTypes.String, args[0].ToString().ToUpperInvariant())
             : throw new Exception("Invalid number of arguments for upper"),
         
         ["lower"] = args => args.Count == 1
-            ? Identifier.Create(DataTypes.Int, args[0].ToString().ToLowerInvariant())
+            ? Identifier.Create(DataTypes.String, args[0].ToString().ToLowerInvariant())
             : throw new Exception("Invalid number of arguments for lower"),
 
         ["len"] = args => args.Count == 1
