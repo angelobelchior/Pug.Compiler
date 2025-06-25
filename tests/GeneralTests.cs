@@ -47,7 +47,9 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(31, "idade = idade + 1", "1")]
     [InlineData(32, "string nome = \"Angelo\"", "Angelo")]
     [InlineData(33, "nome = nome + \" Belchior\"", "Angelo Belchior")]
-    public void Must_Parse_Expressions_With_Order(
+    [InlineData(34, "\"A\" * 3", "AAA")]
+    [InlineData(35, "3 * \"A\"", "AAA")]
+    public void Must_Parse_Expressions(
 #pragma warning disable xUnit1026
         int order,
 #pragma warning restore xUnit1026
@@ -138,7 +140,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("int x = \"abcd\"", "Invalid type string. Expected a int")]
     [InlineData("double x = false", "Invalid type bool. Expected a double")]
     [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
-    [InlineData("bool x = 12234", "Invalid type int or double. Expected a bool")]
+    [InlineData("bool x = 12234", "Invalid type number. Expected a bool")]
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
     [InlineData("1 == \"abcd\"", "Cannot apply Equal operator to different types: Double and String")]
     [InlineData("1 != \"abcd\"", "Cannot apply NotEqual operator to different types: Double and String")]
@@ -222,7 +224,7 @@ public class GeneralTests(SharedValue sharedValue)
             var syntaxParser = new SyntaxParser(results, tokens);
             var result = syntaxParser.Evaluate();
 
-            Assert.Equal(10, result[0].ToInt());
+            Assert.Equal(10, result.AsInt());
 
             lexer = new Lexer("idade = y");
             tokens = lexer.ExtractTokens();
