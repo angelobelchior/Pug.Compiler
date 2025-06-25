@@ -62,6 +62,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             var right = EvaluateMultiplyOrDivide();
             left = EvaluateOperation(left, right, op);
         }
+
         return left;
     }
 
@@ -123,10 +124,9 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
         var token = NextIfTokenIs(TokenType.Identifier);
 
-        if (!identifiers.TryGetValue(token.Value, out var identifier))
-            throw new Exception($"Unknown identifier: {token.Value}");
-
-        return identifier;
+        return !identifiers.TryGetValue(token.Value, out var identifier)
+            ? throw new Exception($"Unknown identifier: {token.Value}")
+            : identifier;
     }
 
     private Identifier EvaluateFunction()

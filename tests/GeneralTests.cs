@@ -7,7 +7,7 @@ using Xunit.Sdk;
 
 namespace Pug.Compiler.Tests;
 
-[TestCaseOrderer("Pug.Compiler.Tests.InlineDataOrderer", "Pug.Compiler.Tests")]
+[TestCaseOrderer("Pug.Compiler.Tests." + nameof(InlineDataOrderer), "Pug.Compiler.Tests")]
 [Collection(nameof(SharedCollection))]
 public class GeneralTests(SharedValue sharedValue)
 {
@@ -157,6 +157,57 @@ public class GeneralTests(SharedValue sharedValue)
         });
 
         Assert.Equal(exceptionMessage, exception.Message);
+    }
+
+    [Theory]
+    [InlineData("true && true", "True")]
+    [InlineData("true && false", "False")]
+    [InlineData("false && false", "False")]
+    [InlineData("false && true", "False")]
+    [InlineData("true || true", "True")]
+    [InlineData("true || false", "True")]
+    [InlineData("false || false", "False")]
+    [InlineData("false || true", "True")]
+    [InlineData("pow(2) == 4 && min(3,2) == 2", "True")]
+    [InlineData("sqrt(25) == 5 && max(1,7) == 7", "True")]
+    [InlineData("len(\"abc\") == 3 && round(2.7) == 3", "True")]
+    [InlineData("pow(2) == 5 && sqrt(16) == 4", "False")]
+    [InlineData("min(8,3) == 8 || max(1,7) == 10", "False")]
+    [InlineData("pow(3) == 9 || len(\"dog\") == 4", "True")]
+    [InlineData("sqrt(36) == 7 || round(1.4) == 1", "True")]
+    [InlineData("upper(\"dog\") == \"DOG\" && lower(\"CAT\") == \"cat\"", "True")]
+    [InlineData("replace(\"abc\", \"b\", \"d\") == \"abc\" || pow(2,3) == 8", "True")]
+    [InlineData("round(2.51) == 3 && len(\"pug\") == 4", "False")]
+    [InlineData("1 == 1", "True")]
+    [InlineData("1 != 2", "True")]
+    [InlineData("3 > 2", "True")]
+    [InlineData("4 >= 4", "True")]
+    [InlineData("5 < 10", "True")]
+    [InlineData("7 <= 7", "True")]
+    [InlineData("(2 < 3) && (4 > 1)", "True")]
+    [InlineData("(3 == 3) || (6 != 6)", "True")]
+    [InlineData("sqrt(25) == 5", "True")]
+    [InlineData("pow(3) == 9", "True")]
+    [InlineData("min(8, 3) == 8", "False")]
+    [InlineData("max(1, 7) > 10", "False")]
+    [InlineData("round(2.49) == 2", "True")]
+    [InlineData("round(2.51) == 2", "False")]
+    [InlineData("len(\"pug\") == 3", "True")]
+    [InlineData("replace(\"abc\", \"b\", \"d\") == \"adc\"",  "True")]
+    [InlineData("upper(\"dog\") == \"DOG\"", "True")]
+    [InlineData("lower(\"CAT\") != \"cat\"", "False")]
+    public void Must_Parse_Logical_Expressions(
+        string expression,
+        string expectedResult)
+    {
+        var lexer = new Lexer(expression);
+        var tokens = lexer.ExtractTokens();
+
+        var syntaxParser = new SyntaxParser(_expressionResults, tokens);
+        var result = syntaxParser.Evaluate();
+
+        Assert.Single(result);
+        Assert.Equal(expectedResult, result[0].Value.ToString());
     }
 
     [Fact]
