@@ -14,18 +14,24 @@ public class Lexer
     {
         _text = text;
         _currentPosition = 0;
-        _currentChar = _text.Length > 0 ? _text[_currentPosition] : Token.EOF;
+        _currentChar = _text.Length > 0 ? _text[_currentPosition] : Token.END_OF_FILE;
     }
 
     public List<Token> ExtractTokens()
     {
         var tokens = new List<Token>();
 
-        while (_currentChar != Token.EOF)
+        while (_currentChar != Token.END_OF_FILE)
         {
             if (char.IsWhiteSpace(_currentChar))
             {
                 IgnoreWhitespace();
+                continue;
+            }
+
+            if (_currentChar == Token.DIVIDER && Peek() == Token.DIVIDER)
+            {
+                IgnoreComment();
                 continue;
             }
 
@@ -41,7 +47,7 @@ public class Lexer
                 continue;
             }
 
-            if (_currentChar == Token.ASSIGN)
+            if (_currentChar == Token.EQUAL && Peek() != Token.EQUAL)
             {
                 tokens.Add(Token.Assign(_currentPosition));
                 Next();
@@ -75,6 +81,18 @@ public class Lexer
         if (identifier.Value is Token.TRUE or Token.FALSE)
             return Token.Bool(position, identifier.Value);
 
+        if (identifier.Value == Token.IF)
+            return Token.If(position);
+
+        if (identifier.Value == Token.THEN)
+            return Token.Then(position);
+
+        if (identifier.Value == Token.ELSE)
+            return Token.Else(position);
+
+        if (identifier.Value == Token.END)
+            return Token.End(position);
+
         return Token.Identifier(position, identifier.Value);
     }
 
@@ -85,7 +103,7 @@ public class Lexer
         Next();
         var stringValue = new StringBuilder();
 
-        while (_currentChar != Token.QUOTE && _currentChar != Token.EOF)
+        while (_currentChar != Token.QUOTE && _currentChar != Token.END_OF_FILE)
         {
             stringValue.Append(_currentChar);
             Next();
@@ -101,20 +119,44 @@ public class Lexer
     private Token ExtractSymbols()
     {
         var position = _currentPosition;
-        var token = _currentChar switch
+
+        var doubleCharToken = (_currentChar, Peek()) switch
         {
-            Token.PLUS => Token.Plus(position),
-            Token.MINUS => Token.Minus(position),
-            Token.MULTIPLY => Token.Multiply(position),
-            Token.DIVIDER => Token.Divide(_currentPosition),
-            Token.OPEN_PARENTHESIS => Token.OpenParenthesis(position),
-            Token.CLOSE_PARENTHESIS => Token.CloseParenthesis(position),
-            Token.COMMA => Token.Comma(position),
-            _ => throw new Exception($"Unexpected character {_currentChar} at position {position}")
+            (Token.AMPERSAND, Token.AMPERSAND) => Token.And(position),
+            (Token.PIPE, Token.PIPE) => Token.Or(position),
+            (Token.EQUAL, Token.EQUAL) => Token.Equal(position),
+            (Token.NOT, Token.EQUAL) => Token.NotEqual(position),
+            (Token.GREATER, Token.EQUAL) => Token.GreaterOrEqual(position),
+            (Token.LESS, Token.EQUAL) => Token.LessOrEqual(position),
+            _ => null
+        };
+        
+        if (doubleCharToken is not null)
+        {
+            Next(2);
+            return doubleCharToken;
+        }
+
+        var singleCharTokenFactory = new Dictionary<char, Func<int, Token>>
+        {
+            [Token.PLUS] = Token.Plus,
+            [Token.MINUS] = Token.Minus,
+            [Token.MULTIPLY] = Token.Multiply,
+            [Token.DIVIDER] = Token.Divide,
+            [Token.OPEN_PARENTHESIS] = Token.OpenParenthesis,
+            [Token.CLOSE_PARENTHESIS] = Token.CloseParenthesis,
+            [Token.COMMA] = Token.Comma,
+            [Token.GREATER] = Token.Greater,
+            [Token.LESS] = Token.Less
         };
 
-        Next();
-        return token;
+        if (singleCharTokenFactory.TryGetValue(_currentChar, out var tokenFactory))
+        {
+            Next();
+            return tokenFactory(position);
+        }
+
+        throw new Exception($"Unexpected character {_currentChar}");
     }
 
     private Token ExtractNumber()
@@ -166,18 +208,27 @@ public class Lexer
     private char Peek()
     {
         var position = _currentPosition + 1;
-        return position < _text.Length ? _text[position] : Token.EOF;
+        return position < _text.Length ? _text[position] : Token.END_OF_FILE;
     }
 
-    private void Next()
+    private void Next(int count = 1)
     {
-        _currentPosition++;
-        _currentChar = _currentPosition < _text.Length ? _text[_currentPosition] : Token.EOF;
+        _currentPosition += count;
+        _currentChar = _currentPosition < _text.Length ? _text[_currentPosition] : Token.END_OF_FILE;
     }
 
     private void IgnoreWhitespace()
     {
         while (char.IsWhiteSpace(_currentChar))
+            Next();
+    }
+
+    private void IgnoreComment()
+    {
+        while (_currentChar != Token.NEW_LINE && _currentChar != Token.END_OF_FILE)
+            Next();
+
+        if (_currentChar == Token.NEW_LINE)
             Next();
     }
 }

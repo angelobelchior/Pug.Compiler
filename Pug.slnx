@@ -1,4 +1,5 @@
-﻿<Solution>
+<Solution>
+  <Project Path="src\Editor\Pug.Compiler.Editor.csproj" Type="Classic C#" />
+  <Project Path="src\Compiler\Pug.Compiler.csproj" Type="Classic C#" />
   <Project Path="tests\Pug.Compiler.Tests.csproj" Type="Classic C#" />
-  <Project Path="src\Pug.Compiler.csproj" Type="Classic C#" />
 </Solution>

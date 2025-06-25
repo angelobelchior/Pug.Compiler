@@ -1,0 +1,150 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pug Editor</title>
+    
+    <link rel="icon" type="image/x-icon" href="icon.png">
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <script type="importmap"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs/loader.js"></script>
+</head>
+<body>
+
+
+<div class="container">
+    <main role="main" class="pb-3">
+        <div class="container-fluid  mt-4">
+            <div class="row">
+                <div class="col-lg-9 col-md-8 col-12">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="mb-2">
+                                <form id="formEditor" method="POST">
+                                    <input type="hidden" id="editor-content" name="editor-content"/>
+                                    <button id="run-button" class="btn btn-primary">
+                                        <i class="bi bi-play-fill"></i>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div id="container" style="height: 650px; border: 1px solid #ccc;">
+                            </div>
+                            <script>
+                                require.config({paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs'}});
+                                require(['vs/editor/editor.main'], function () {
+                                    monaco.languages.register({id: 'pug-lang'});
+
+                                    monaco.languages.setMonarchTokensProvider('pug-lang', {
+                                        tokenizer: {
+                                            root: [
+                                                [/\/\/.*/, 'comment'],
+                                                [/\b(print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear)\b/, 'function'],
+                                                [/\b(true|false|func|if|else|end|then)\b/, 'keyword'],
+                                                [/\b(int|string|double|bool)\b/, 'type'],
+                                                [/\b(==|=|\+|-|\*|\/|&&|\|\|)\b/, 'operator'],
+                                                [/\b\d+\b/, 'number'],
+                                                [/"([^"\\]|\\.)*"/, 'string'],
+                                                [/[a-zA-Z_][a-zA-Z0-9_]*/, 'identifier']
+                                            ]
+                                        }
+                                    });
+
+                                    monaco.editor.defineTheme('pug-dark', {
+                                        base: 'vs-dark',
+                                        inherit: true,
+                                        rules: [
+                                            { token: 'function', foreground: '#6fA076' },
+                                            { token: 'keyword', foreground: '#569CD6' },
+                                            { token: 'type', foreground: '#569CD6' },
+                                        ],
+                                        colors: {
+                                            'editor.foreground': '#FFFFFF',
+                                            'editor.background': '#1E1E1E'
+                                        }
+                                    });
+
+                                    monaco.languages.setLanguageConfiguration('pug-lang', {
+                                        comments: {
+                                            lineComment: '//',
+                                        },
+                                        brackets: [
+                                            ['(', ')']
+                                        ],
+                                        autoClosingPairs: [
+                                            {open: '"', close: '"', notIn: ['string']},
+                                            {open: '(', close: ')', notIn: ['string']}
+                                        ],
+                                        folding: {
+                                            markers: {
+                                                start: /^(if|else|func|end|then|return)\b/,
+                                                end: /^(end)\b/
+                                            }
+                                        }
+                                    });
+
+                                    const editor = monaco.editor.create(document.getElementById('container'), {
+                                        value: `@Html.Raw(Model.Code)`,
+                                        language: 'pug-lang',
+                                        theme: 'pug-dark',
+                                        fontSize: 16
+                                    });
+
+                                    document.getElementById('run-button').addEventListener('click', function () {
+                                        const pugCode = editor.getValue();
+                                        document.getElementById('editor-content').value = pugCode;
+                                        document.getElementById('run-button').submit();
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="app-console"
+                                 style="height: 250px; background: #222; color: #0f0; padding: 10px; font-family: monospace; overflow-y: auto;">
+                                @Html.Raw(Model.Result)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <h5>Tokens</h5>
+                        <ul class="list-group">
+                            @foreach (var token in Model.Tokens)
+                            {
+                                <li class="list-group-item">@token</li>
+                            }
+                        </ul>
+                    </div>
+
+                    <div class="row">
+                        <h5>Identifiers</h5>
+                        <ul class="list-group">
+                            @foreach (var identifier in Model.Identifiers)
+                            {
+                                <li class="list-group-item">@identifier.DataType => @identifier.Value</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>
+
+

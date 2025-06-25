@@ -24,8 +24,8 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(8, "string sobrenome = \"Belchior\"", "Belchior")]
     [InlineData(9, "string completo = nome + \" \" + sobrenome", "Angelo Belchior")]
     [InlineData(10, "string reduzido = completo - \"Belchior\"", "Angelo ")]
-    [InlineData(11, "bool isTrue = true", "true")]
-    [InlineData(12, "bool isFalse = false", "false")]
+    [InlineData(11, "bool isTrue = true", "True")]
+    [InlineData(12, "bool isFalse = false", "False")]
     [InlineData(13, "double raiz = sqrt(16)", "4")]
     [InlineData(14, "double potencia = pow(2, 3)", "8")]
     [InlineData(15, "double minimo = min(10, 20)", "10")]
@@ -42,7 +42,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(26, "double a", "0")]
     [InlineData(27, "int b", "0")]
     [InlineData(28, "string c", "")]
-    [InlineData(29, "bool d", "false")]
+    [InlineData(29, "bool d", "False")]
     [InlineData(30, "int idade", "0")]
     [InlineData(31, "idade = idade + 1", "1")]
     [InlineData(32, "string nome = \"Angelo\"", "Angelo")]
@@ -62,7 +62,56 @@ public class GeneralTests(SharedValue sharedValue)
         var syntaxParser = new SyntaxParser(_expressionResults, tokens);
         var result = syntaxParser.Evaluate();
 
-        Assert.Equal(expectedResult, result.Value.ToString());
+        if (expectedResult == "\0")
+            Assert.Empty(result);
+        else
+            Assert.Equal(expectedResult, result[0].Value.ToString());
+    }
+
+    [Theory]
+    [InlineData("\"A\" * 3", "AAA")]
+    [InlineData("3 * \"A\"", "AAA")]
+    [InlineData("\"A\" + 3", "A3")]
+    [InlineData("3 + \"A\" //esse comentário", "3A")]
+    [InlineData("//este é um comentário", "\0")]
+    [InlineData("string texto = \"Esse texto tem // barras\"", "Esse texto tem // barras")]
+    [InlineData("1==1", "True")]
+    [InlineData("1!=1", "False")]
+    [InlineData("\"a\"==\"a\"", "True")]
+    [InlineData("\"a\"!=\"a\"", "False")]
+    [InlineData("\"a\"==\"b\"", "False")]
+    [InlineData("\"a\"!=\"b\"", "True")]
+    [InlineData("true==true", "True")]
+    [InlineData("true!=true", "False")]
+    [InlineData("false==false", "True")]
+    [InlineData("false!=false", "False")]
+    [InlineData("1 == (2*3)", "False")]
+    [InlineData("4 == pow(2)", "True")]
+    [InlineData("3 == (pow(2) - 1)", "True")]
+    [InlineData("4 == (pow(2) - 1)", "False")]
+    [InlineData("3 == pow(2) - 1", "True")]
+    [InlineData("true && true", "True")]
+    [InlineData("true && false", "False")]
+    [InlineData("false && false", "False")]
+    [InlineData("false && true", "False")]
+    [InlineData("true || true", "True")]
+    [InlineData("true || false", "True")]
+    [InlineData("false || false", "False")]
+    [InlineData("false || true", "True")]
+    public void Must_Parse_Expressions(
+        string expression,
+        string expectedResult)
+    {
+        var lexer = new Lexer(expression);
+        var tokens = lexer.ExtractTokens();
+
+        var syntaxParser = new SyntaxParser(_expressionResults, tokens);
+        var result = syntaxParser.Evaluate();
+
+        if (expectedResult == "\0")
+            Assert.Empty(result);
+        else
+            Assert.Equal(expectedResult, result[0].Value.ToString());
     }
 
     [Theory]
@@ -93,6 +142,8 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
     [InlineData("bool x = 12234", "Invalid type number. Expected a bool")]
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
+    [InlineData("1 == \"abcd\"", "Cannot apply Equal operator to different types: Double and String")]
+    [InlineData("1 != \"abcd\"", "Cannot apply NotEqual operator to different types: Double and String")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
         string exceptionMessage)

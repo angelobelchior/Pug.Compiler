@@ -122,12 +122,17 @@ public class IdentifierTests
     [Fact]
     public void FromToken_WithBoolToken_ShouldReturnBoolResult()
     {
-        var token = Token.Bool(2, "true");
-
+        var token = Token.Bool(2, true.ToString());
         var result = Identifier.FromToken(token);
 
         Assert.Equal(DataTypes.Bool, result.DataType);
-        Assert.Equal("true", result.Value);
+        Assert.Equal("True", result.Value);
+        
+         token = Token.Bool(2, false.ToString());
+         result = Identifier.FromToken(token);
+
+        Assert.Equal(DataTypes.Bool, result.DataType);
+        Assert.Equal("False", result.Value);
     }
 
     [Fact]
