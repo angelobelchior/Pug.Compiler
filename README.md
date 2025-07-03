@@ -6,7 +6,7 @@ Esse repositório faz parte da série [Reinventando a Roda: Criando um compilado
 
 Essa construção será dividida em partes e cada parte terá um post e uma branch específica.
 
-Cada post vai conter a explicação e implementação de uma ou mais funcionalidades do compilador e sempre estará associado a uma branch (parte1, parte2, etc.)
+Cada post vai conter a explicação e implementação de uma ou mais funcionalidades do compilador e sempre estará associado a uma branch (parte1, parte2, etc.).
 
 
 A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 4](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-4-304d).
