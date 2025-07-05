@@ -10,6 +10,7 @@ Cada post vai conter a explicação e implementação de uma ou mais funcionalid
 
 
 A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 5](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-5-2hoi).
+
 ----
 
 ## Parte 5
