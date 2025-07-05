@@ -45,7 +45,6 @@
                                 require.config({paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/min/vs'}});
                                 require(['vs/editor/editor.main'], function () {
                                     monaco.languages.register({id: 'pug-lang'});
-
                                     monaco.languages.setMonarchTokensProvider('pug-lang', {
                                         tokenizer: {
                                             root: [
@@ -53,14 +52,13 @@
                                                 [/\b(print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear)\b/, 'function'],
                                                 [/\b(true|false|func|if|else|end|then)\b/, 'keyword'],
                                                 [/\b(int|string|double|bool)\b/, 'type'],
-                                                [/\b(==|=|\+|-|\*|\/|&&|\|\|)\b/, 'operator'],
+                                                [/\b(==|=|\+|-|\*|\/|%|&&|\|\|)\b/, 'operator'],
                                                 [/\b\d+\b/, 'number'],
                                                 [/"([^"\\]|\\.)*"/, 'string'],
                                                 [/[a-zA-Z_][a-zA-Z0-9_]*/, 'identifier']
                                             ]
                                         }
                                     });
-
                                     monaco.editor.defineTheme('pug-dark', {
                                         base: 'vs-dark',
                                         inherit: true,
@@ -74,7 +72,6 @@
                                             'editor.background': '#1E1E1E'
                                         }
                                     });
-
                                     monaco.languages.setLanguageConfiguration('pug-lang', {
                                         comments: {
                                             lineComment: '//',
@@ -93,14 +90,12 @@
                                             }
                                         }
                                     });
-
                                     const editor = monaco.editor.create(document.getElementById('container'), {
                                         value: `@Html.Raw(Model.Code)`,
                                         language: 'pug-lang',
                                         theme: 'pug-dark',
                                         fontSize: 16
                                     });
-
                                     document.getElementById('run-button').addEventListener('click', function () {
                                         const pugCode = editor.getValue();
                                         document.getElementById('editor-content').value = pugCode;

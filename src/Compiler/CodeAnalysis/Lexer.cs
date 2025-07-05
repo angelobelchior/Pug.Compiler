@@ -143,6 +143,7 @@ public class Lexer
             [Token.MINUS] = Token.Minus,
             [Token.MULTIPLY] = Token.Multiply,
             [Token.DIVIDER] = Token.Divide,
+            [Token.REMAINDER] = Token.Remainder,
             [Token.OPEN_PARENTHESIS] = Token.OpenParenthesis,
             [Token.CLOSE_PARENTHESIS] = Token.CloseParenthesis,
             [Token.COMMA] = Token.Comma,
@@ -196,7 +197,7 @@ public class Lexer
         var position = _currentPosition;
         var result = new StringBuilder();
 
-        while (char.IsLetter(_currentChar))
+        while (char.IsLetter(_currentChar) || char.IsDigit(_currentChar) || _currentChar == '_')
         {
             result.Append(_currentChar);
             Next();

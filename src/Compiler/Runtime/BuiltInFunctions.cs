@@ -37,11 +37,11 @@ public static class BuiltInFunctions
             2 => Identifier.Create(DataTypes.Double, Random.Shared.Next(args[0].ToInt(), args[1].ToInt())),
             _ => throw new Exception("Invalid number of arguments for random")
         },
-        
+
         ["upper"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.String, args[0].ToString().ToUpperInvariant())
             : throw new Exception("Invalid number of arguments for upper"),
-        
+
         ["lower"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.String, args[0].ToString().ToLowerInvariant())
             : throw new Exception("Invalid number of arguments for lower"),
@@ -49,11 +49,11 @@ public static class BuiltInFunctions
         ["len"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Int, args[0].ToString().Length)
             : throw new Exception("Invalid number of arguments for len"),
-        
+
         ["replace"] = args => args.Count == 3
             ? Identifier.Create(DataTypes.String, args[0].ToString().Replace(args[1].ToString(), args[2].ToString()))
             : throw new Exception("Invalid number of arguments for replace"),
-        
+
         ["substr"] = args => args.Count switch
         {
             2 => Identifier.Create(DataTypes.String, args[0].ToString().Substring(args[1].ToInt())),
@@ -70,7 +70,7 @@ public static class BuiltInFunctions
 
             return Identifier.None;
         },
-        
+
         ["clear"] = _ =>
         {
             Console.Clear();

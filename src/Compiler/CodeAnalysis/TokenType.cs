@@ -12,6 +12,7 @@ public enum TokenType
     Minus,
     Multiply,
     Divide,
+    Remainder,
 
     Assign,
 

@@ -9,8 +9,50 @@ Essa construção será dividida em partes e cada parte terá um post e uma bran
 Cada post vai conter a explicação e implementação de uma ou mais funcionalidades do compilador e sempre estará associado a uma branch (parte1, parte2, etc.)
 
 
-A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 4](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-4-304d).
+A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 5](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-5-2hoi).
+----
 
+## Parte 5
+
+**Link para o Post:**
+- https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-5-2hoi
+
+**Link para a Branch:**
+- https://github.com/angelobelchior/Pug.Compiler/tree/parte5
+
+**Funcionalidades:**
+- Suporte a if/then/else
+- Inclusão do operador `%` para obter o resto da divisão 
+
+Nessa branch foi ajustado o código para que nomes de variáveis permitirem `_` e números no meio da palavra: Exemplo: `int idade_1 = 41`
+
+```bash
+int idade = 18
+string nome = "Angelo"
+if idade >= 18 then
+    print("acesso permitido")
+else
+    if nome == "Angelo" then
+        print("acesso em avaliação")
+    else
+        print("acesso negado")
+    end
+end
+print("Fim do programa")
+
+> acesso permitido
+> Fim do programa
+
+----
+
+if 4 % 2 == 0 then
+    print("É par")
+else
+    print("É ímpar")
+end
+
+> É par
+```
 ----
 
 ## Parte 4
@@ -45,6 +87,9 @@ True
 > 3 <= 2
 False
 ```
+
+![Pug.Editor](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fm58yef7jceq45qcenxen.png)
+
 ----
 
 ## Parte 3

@@ -14,6 +14,7 @@ public class Token
     public const char MINUS = '-';
     public const char MULTIPLY = '*';
     public const char DIVIDER = '/';
+    public const char REMAINDER = '%';
     public const char EQUAL = '=';
 
     public const char OPEN_PARENTHESIS = '(';
@@ -74,6 +75,9 @@ public class Token
 
     public static Token Divide(int position)
         => new(TokenType.Divide, DIVIDER, position);
+    
+    public static Token Remainder(int position)
+        => new(TokenType.Remainder, REMAINDER, position);
 
     public static Token Assign(int position)
         => new(TokenType.Assign, EQUAL, position);

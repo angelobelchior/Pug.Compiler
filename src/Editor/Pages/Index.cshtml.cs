@@ -10,12 +10,18 @@ public class IndexModel : PageModel
 
     public string Code { get; set; } =
 """
-int idade = 41
-if idade == 1 then
-    print("igual")
+int idade = 18
+string nome = "Angelo"
+if idade >= 18 then
+    print("acesso permitido")
 else
-    print("diferente")
+    if nome == "Angelo" then
+        print("acesso em avaliação")
+    else
+        print("acesso negado")
+    end
 end
+print("Fim do programa")
 """;
     public List<Token> Tokens { get; set; } = [];
     public List<Identifier> Identifiers { get; set; } = [];
