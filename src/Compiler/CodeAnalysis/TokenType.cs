@@ -26,7 +26,6 @@ public enum TokenType
     DataType,
 
     If,
-    Then,
     Else,
     End,
     

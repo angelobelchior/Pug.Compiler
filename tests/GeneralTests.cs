@@ -239,10 +239,10 @@ public class GeneralTests(SharedValue sharedValue)
         """
         int idade = 18
         string nome = "Angelo"
-        if idade >= 18 then
+        if idade >= 18
             string a = "acesso permitido"
         else
-            if nome == "Angelo" then
+            if nome == "Angelo"
                 string b = "acesso em avaliação"
             else
                 string c = "acesso negado"
@@ -256,7 +256,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(
         """
         int idade = 41
-        if idade == 41 then
+        if idade == 41
             string a = "igual"
         else
             string a = "diferente"
@@ -268,7 +268,7 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(
         """
         int idade = 22
-        if idade == 41 then
+        if idade == 41
            string a = "igual"
         else
             string b = "diferente"
@@ -281,7 +281,7 @@ public class GeneralTests(SharedValue sharedValue)
         """
         int idade = 30
         bool cadastrado = true
-        if idade >= 18 && cadastrado == true then
+        if idade >= 18 && cadastrado == true
             string a = "acesso liberado"
         else
             string b = "acesso negado"
@@ -294,7 +294,7 @@ public class GeneralTests(SharedValue sharedValue)
         """
         int a = 5
         int b = 10
-        if (a + b) == 15 then
+        if (a + b) == 15
             string c = "soma correta"
         else
             string d = "soma incorreta"
@@ -306,11 +306,11 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(
         """
         int idade = 15
-        if idade >= 0 then
-            if idade < 12 then
+        if idade >= 0
+            if idade < 12
                 string a = "criança"
             else
-                if idade < 18 then
+                if idade < 18
                     string b = "adolescente"
                 else
                     string c = "adulto"
@@ -326,11 +326,11 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(
         """
         int idade = 10
-        if idade >= 0 then
-            if idade < 12 then
+        if idade >= 0
+            if idade < 12
                 string a = "criança"
             else
-                if idade < 18 then
+                if idade < 18
                     string b = "adolescente"
                 else
                     string c = "adulto"
@@ -346,11 +346,11 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(
         """
         int idade = 19
-        if idade >= 0 then
-            if idade < 12 then
+        if idade >= 0
+            if idade < 12
                 string a = "criança"
             else
-                if idade < 18 then
+                if idade < 18
                     string b = "adolescente"
                 else
                     string c = "adulto"
@@ -366,11 +366,11 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData(
         """
         int idade = -10
-        if idade >= 0 then
-            if idade < 12 then
+        if idade >= 0
+            if idade < 12
                 string a = "criança"
             else
-                if idade < 18 then
+                if idade < 18
                     string b = "adolescente"
                 else
                     string c = "adulto"

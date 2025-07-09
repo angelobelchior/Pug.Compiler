@@ -86,9 +86,6 @@ public class Lexer
         if (identifier.Value == Token.IF)
             return Token.If(position);
 
-        if (identifier.Value == Token.THEN)
-            return Token.Then(position);
-
         if (identifier.Value == Token.ELSE)
             return Token.Else(position);
 

@@ -104,7 +104,6 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
     {
         NextIfTokenIs(TokenType.If);
         var condition = EvaluateExpression();
-        NextIfTokenIs(TokenType.Then);
 
         if (condition.ToBool())
             ParseBlock(TokenType.Else, TokenType.End);

@@ -36,7 +36,7 @@ public record Sample(string Title, string Code)
             new("Conditionals",
                 """
                 int x = 10
-                if x > 5 then
+                if x > 5
                     print("x is greater than 5")
                 else    
                     print("x is 5 or less")
@@ -48,10 +48,10 @@ public record Sample(string Title, string Code)
                 """
                 int idade = 18
                 string nome = "Angelo"
-                if idade >= 18 then
+                if idade >= 18
                    print("Acesso permitido")
                 else
-                   if nome == "Angelo" then
+                   if nome == "Angelo"
                        print("Acesso em avaliação")
                    else
                        print("Acesso negado")
@@ -111,12 +111,12 @@ public record Sample(string Title, string Code)
             new("Syntax Error", 
                 """
                 int x = 10
-                if x > 5 //then
-                    print("Missing 'then' keyword")
+                if x > // 5
+                    print("where is 5?")
                 else    
                     print("x is 5 or less")
                 // end
-                print("Missing 'end' keyword")
+                print("ihuuuu....")
                 """),
         };
 

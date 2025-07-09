@@ -24,7 +24,7 @@ public class Token
     public const string FALSE = "false";
 
     public const string IF = "if";
-    public const string THEN = "then";
+    // public const string THEN = "then";
     public const string ELSE = "else";
     public const string END = "end";
     public const char GREATER = '>';
@@ -99,10 +99,7 @@ public class Token
 
     public static Token If(int position)
         => new(TokenType.If, IF, position);
-
-    public static Token Then(int position)
-        => new(TokenType.Then, THEN, position);
-
+    
     public static Token Else(int position)
         => new(TokenType.Else, ELSE, position);
 
