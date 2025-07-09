@@ -24,6 +24,12 @@ A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará c
 **Funcionalidades:**
 - Suporte a if/then/else
 - Inclusão do operador `%` para obter o resto da divisão 
+- Inclusão da função interna `iif`
+- Melhoria no Pug Editor
+  - Ajustes no Layout
+  - Inclusão de um combo com samples de código
+  - Ao clicar em um _token_ (no painel a esquerda) é possível visualizar no editor o código-fonte que gerou aquele _token_
+  - Caso ocorra algum erro de compilação, o editor irá destacar a linha do erro
 
 Nessa branch foi ajustado o código para que nomes de variáveis permitirem `_` e números no meio da palavra: Exemplo: `int idade_1 = 41`
 
@@ -44,7 +50,7 @@ print("Fim do programa")
 > acesso permitido
 > Fim do programa
 
-----
+//--
 
 if 4 % 2 == 0 then
     print("É par")
@@ -53,7 +59,17 @@ else
 end
 
 > É par
+
+//--
+
+int idade = 15
+string mensagem = iif(idade >= 18, "Acesso Liberado", "Acesso Negado")
+print(mensagem)
+
 ```
+
+![Pug Editor](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/3iubz6nnny17erb9nkvv.gif)
+
 ----
 
 ## Parte 4

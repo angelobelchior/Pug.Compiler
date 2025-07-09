@@ -33,27 +33,16 @@ public class IdentifierTests
     public void Create_WithInvalidValueInt_ShouldThrowException(object value)
     {
         var result = Identifier.Create(DataTypes.Int, value);
-        Assert.Throws<Exception>(() => result.ToInt());
+        Assert.Throws<SyntaxParserException>(() => result.ToInt());
     }
 
-    // [Theory]
-    // [InlineData("42,5")]
-    // [InlineData(42.5)]
-    // public void Create_WithDoubleValue_ShouldReturnDoubleResult(object value)
-    // {
-    //     var result = Identifier.Create(DataTypes.Double, value);
-    //
-    //     Assert.Equal(DataTypes.Double, result.DataType);
-    //     Assert.Equal(42.5, result.AsDouble());
-    // }
-    
     [Theory]
     [InlineData("Romarinho")]
     [InlineData("")]
     public void Create_WithInvalidValueDouble_ShouldThrowException(object value)
     {
         var result = Identifier.Create(DataTypes.Double, value);
-        Assert.Throws<Exception>(() => result.ToDouble());
+        Assert.Throws<SyntaxParserException>(() => result.ToDouble());
     }
 
     [Theory]
@@ -86,7 +75,7 @@ public class IdentifierTests
     public void Create_WithInvalidValueBoolean_ShouldThrowException(object value)
     {
         var result = Identifier.Create(DataTypes.Bool, value);
-        Assert.Throws<Exception>(() => result.ToBool());
+        Assert.Throws<SyntaxParserException>(() => result.ToBool());
     }
 
     [Fact]
@@ -151,7 +140,7 @@ public class IdentifierTests
     {
         var token = Token.Identifier(4, "variable");
 
-        var exception = Assert.Throws<Exception>(() => Identifier.FromToken(token));
+        var exception = Assert.Throws<SyntaxParserException>(() => Identifier.FromToken(token));
 
         Assert.Equal("Invalid token type: Identifier", exception.Message);
     }
@@ -180,7 +169,7 @@ public class IdentifierTests
     {
         var result = Identifier.Create(DataTypes.Int, 42);
 
-        Assert.Throws<Exception>(() => result.Cast("unknown"));
+        Assert.Throws<SyntaxParserException>(() => result.Cast("unknown"));
     }
     
     [Theory]

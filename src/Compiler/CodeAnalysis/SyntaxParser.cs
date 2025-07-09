@@ -3,23 +3,27 @@ using Pug.Compiler.Runtime;
 
 namespace Pug.Compiler.CodeAnalysis;
 
-public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token> tokens)
+public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> tokens)
 {
     private int _currentPosition;
+
     private Token CurrentToken
         => _currentPosition < tokens.Count
             ? tokens[_currentPosition]
-            : Token.EndOfFile(_currentPosition);
+            : tokens.First(t => t.Type == TokenType.EndOfFile);
+
+    private readonly List<Identifier> _identifiers = new();
 
     public List<Identifier> Evaluate()
     {
-        var results = new List<Identifier>();
+        _identifiers.Clear();
         while (_currentPosition < tokens.Count && CurrentToken.Type != TokenType.EndOfFile)
         {
             var identifier = EvaluateExpression();
-            results.Add(identifier);
+            _identifiers.Add(identifier);
         }
-        return results;
+
+        return _identifiers;
     }
 
     private Identifier EvaluateExpression()
@@ -93,9 +97,9 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             TokenType.String => EvaluateString(),
             TokenType.Bool => EvaluateBool(),
             TokenType.OpenParenthesis => EvaluateParenthesis(),
-            _ => throw new Exception($"Unexpected token {CurrentToken.Type}")
+            _ => throw SyntaxParserException($"Unexpected token {CurrentToken.Type}")
         };
-    
+
     private Identifier EvaluateIf()
     {
         NextIfTokenIs(TokenType.If);
@@ -119,13 +123,13 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         NextIfTokenIs(TokenType.End);
         return condition;
     }
-    
+
     private void ParseBlock(params TokenType[] delimiters)
     {
         while (!delimiters.Contains(CurrentToken.Type) && CurrentToken.Type != TokenType.EndOfFile)
             EvaluateToken();
     }
-    
+
     private void SkipBlockUntil(params TokenType[] delimiters)
     {
         var nestedIfCount = 0;
@@ -147,13 +151,13 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
     {
         var dataTypeToken = NextIfTokenIs(TokenType.DataType);
         if (!Identifier.ContainsDataType(dataTypeToken.Value))
-            throw new Exception($"Unknown type: {dataTypeToken.Value}");
+            throw SyntaxParserException($"Unknown type: {dataTypeToken.Value}");
 
         var checkNext = Peek();
 
         var name = NextIfTokenIs(TokenType.Identifier).Value;
         var identifier = Identifier.Default(dataTypeToken.Value);
-        identifiers[name] = identifier;
+        variables[name] = identifier;
 
         if (checkNext.Type != TokenType.Assign)
             return identifier;
@@ -162,7 +166,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         var value = EvaluateExpression();
         identifier = value.Cast(dataTypeToken.Value);
 
-        identifiers[name] = identifier;
+        variables[name] = identifier;
         return identifier;
     }
 
@@ -174,8 +178,8 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
 
         var token = NextIfTokenIs(TokenType.Identifier);
 
-        return !identifiers.TryGetValue(token.Value, out var identifier)
-            ? throw new Exception($"Unknown identifier: {token.Value}")
+        return !variables.TryGetValue(token.Value, out var identifier)
+            ? throw SyntaxParserException($"Unknown identifier: {token.Value}")
             : identifier;
     }
 
@@ -236,7 +240,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         return result;
     }
 
-    private static Identifier EvaluateOperation(Identifier left, Identifier right, Token @operator)
+    private Identifier EvaluateOperation(Identifier left, Identifier right, Token @operator)
     {
         if (left.DataType == DataTypes.String || right.DataType == DataTypes.String)
             return EvaluateStringOperation(left, right, @operator);
@@ -244,17 +248,17 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         if (Identifier.AllAreNumberTypes(left.DataType, right.DataType))
             return EvaluateNumberOperation(left, right, @operator);
 
-        throw new Exception($"Unexpected token: {@operator.Type}");
+        throw SyntaxParserException($"Unexpected token: {@operator.Type}");
     }
 
-    private static Identifier EvaluateStringOperation(Identifier left, Identifier right, Token @operator)
+    private Identifier EvaluateStringOperation(Identifier left, Identifier right, Token @operator)
     {
         var value = @operator.Type switch
         {
             TokenType.Plus => left + right.ToString(),
             TokenType.Minus => Minus(left.ToString(), right.ToString()),
             TokenType.Multiply => Multiply(),
-            _ => throw new Exception($"Unexpected token: {@operator.Type}")
+            _ => throw SyntaxParserException($"Unexpected token: {@operator.Type}")
         };
 
         return new Identifier(DataTypes.String, value);
@@ -286,7 +290,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         }
     }
 
-    private static Identifier EvaluateNumberOperation(Identifier left, Identifier right, Token @operator)
+    private Identifier EvaluateNumberOperation(Identifier left, Identifier right, Token @operator)
     {
         var value = @operator.Type switch
         {
@@ -295,7 +299,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             TokenType.Multiply => left.ToDouble() * right.ToDouble(),
             TokenType.Divide => left.ToDouble() / right.ToDouble(),
             TokenType.Remainder => left.ToDouble() % right.ToDouble(),
-            _ => throw new Exception($"Unexpected token: {@operator.Type}")
+            _ => throw SyntaxParserException($"Unexpected token: {@operator.Type}")
         };
 
         return new Identifier(DataTypes.Double, value);
@@ -307,14 +311,14 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         NextIfTokenIs(TokenType.Assign);
         var value = EvaluateExpression();
 
-        if (!identifiers.ContainsKey(variableName))
-            throw new Exception($"Unknown identifier: {variableName}");
+        if (!variables.ContainsKey(variableName))
+            throw SyntaxParserException($"Unknown identifier: {variableName}");
 
-        identifiers[variableName] = value;
+        variables[variableName] = value;
         return value;
     }
 
-    private static Identifier EvaluateComparison(Identifier left, Identifier right, Token @operator)
+    private Identifier EvaluateComparison(Identifier left, Identifier right, Token @operator)
     {
         const double epsilon = 1e-6;
 
@@ -328,7 +332,7 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             TokenType.GreaterOrEqual => Greater() || Equal(),
             TokenType.Less => Less(),
             TokenType.LessOrEqual => Less() || Equal(),
-            _ => throw new Exception($"Unexpected comparison operator: {@operator.Type}")
+            _ => throw SyntaxParserException($"Unexpected comparison operator: {@operator.Type}")
         };
 
         return new Identifier(DataTypes.Bool, result);
@@ -376,19 +380,19 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
             };
 
         bool ThrowException()
-            => throw new Exception($"Cannot compare types: {left.DataType} and {right.DataType}");
+            => throw SyntaxParserException($"Cannot compare types: {left.DataType} and {right.DataType}");
     }
 
-    private static Identifier EvaluateLogicalOperation(Identifier left, Identifier right, Token @operator)
+    private Identifier EvaluateLogicalOperation(Identifier left, Identifier right, Token @operator)
     {
         if (left.DataType != DataTypes.Bool || right.DataType != DataTypes.Bool)
-            throw new Exception($"Logical operator {@operator.Type} can only be applied to bool types");
+            throw SyntaxParserException($"Logical operator {@operator.Type} can only be applied to bool types");
 
         var result = @operator.Type switch
         {
             TokenType.And => left.ToBool() && right.ToBool(),
             TokenType.Or => left.ToBool() || right.ToBool(),
-            _ => throw new Exception($"Unexpected logical operator: {@operator.Type}")
+            _ => throw SyntaxParserException($"Unexpected logical operator: {@operator.Type}")
         };
 
         return new Identifier(DataTypes.Bool, result);
@@ -399,16 +403,38 @@ public class SyntaxParser(Dictionary<string, Identifier> identifiers, List<Token
         var next = _currentPosition + 1;
         return next < tokens.Count
             ? tokens[next]
-            : Token.EndOfFile(next);
+            : tokens.First(t => t.Type == TokenType.EndOfFile);
     }
 
     private Token NextIfTokenIs(TokenType type)
     {
         if (CurrentToken.Type != type)
-            throw new Exception($"Unexpected token: {CurrentToken.Type}, expected: {type}");
+            throw SyntaxParserException(
+                $"Unexpected token: {CurrentToken.Type}({CurrentToken.Value}). Expected: {type}");
 
         var token = CurrentToken;
         _currentPosition++;
         return token;
     }
+
+    private SyntaxParserException SyntaxParserException(string message)
+        => new(message,
+            CurrentToken,
+            tokens,
+            variables,
+            _identifiers);
+}
+
+public class SyntaxParserException(
+    string message,
+    Token? currentToken = null,
+    IReadOnlyList<Token>? tokens = null,
+    Dictionary<string, Identifier>? variables = null,
+    IReadOnlyList<Identifier>? identifiers = null)
+    : Exception(message)
+{
+    public Token? CurrentToken => currentToken;
+    public IReadOnlyList<Token>? Tokens => tokens;
+    public IDictionary<string, Identifier>? Variables => variables;
+    public IReadOnlyList<Identifier>? Identifiers => identifiers;
 }

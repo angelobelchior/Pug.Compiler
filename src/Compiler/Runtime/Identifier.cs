@@ -14,7 +14,7 @@ public class Identifier(DataTypes dataType, object value)
     private const string DoubleType = "double";
     private const string BoolType = "bool";
     private const string StringType = "string";
-    
+
     private static readonly Dictionary<string, Func<Identifier, Identifier>> TypeConverters = new()
     {
         [IntType] = value => new Identifier(DataTypes.Int, value.ToInt()),
@@ -35,7 +35,7 @@ public class Identifier(DataTypes dataType, object value)
             DataTypes.Bool => ToBool().ToString(),
             DataTypes.String => ToString(),
             DataTypes.None => Identifier.None,
-            _ => throw new Exception($"Invalid data type: {DataType}")
+            _ => throw new SyntaxParserException($"Invalid data type: {DataType}")
         };
 
     public static Identifier Create<T>(DataTypes types, T value)
@@ -48,22 +48,23 @@ public class Identifier(DataTypes dataType, object value)
                 double.Parse(token.Value, CultureInfo.InvariantCulture)),
             TokenType.Bool => new Identifier(DataTypes.Bool, token.Value),
             TokenType.String => new Identifier(DataTypes.String, token.Value),
-            _ => throw new Exception($"Invalid token type: {token.Type}")
+            _ => throw new SyntaxParserException($"Invalid token type: {token.Type}")
         };
 
     public static bool ContainsDataType(string type)
         => TypeConverters.ContainsKey(type);
-    
-    public static void  EnsureSameTypes(Identifier left, Identifier right, Token @operator)
+
+    public static void EnsureSameTypes(Identifier left, Identifier right, Token @operator)
     {
         if (AllAreNumberTypes(left.DataType, right.DataType))
             return;
 
         if (left.DataType != right.DataType)
-            throw new Exception(
-                $"Cannot apply {@operator.Type} operator to different types: {left.DataType} and {right.DataType}");
+            throw new SyntaxParserException(
+                $"Cannot apply {@operator.Type} operator to different types: {left.DataType} and {right.DataType}",
+                @operator, [@operator], [], [left, right]);
     }
-    
+
     public static bool AllAreNumberTypes(params DataTypes[] types)
         => types.All(type => type is DataTypes.Double or DataTypes.Int);
 
@@ -74,23 +75,23 @@ public class Identifier(DataTypes dataType, object value)
             DoubleType => new Identifier(DataTypes.Double, 0),
             BoolType => new Identifier(DataTypes.Bool, false),
             StringType => new Identifier(DataTypes.String, string.Empty),
-            _ => throw new Exception($"Invalid data type: {typeName}")
+            _ => throw new SyntaxParserException($"Invalid data type: {typeName}")
         };
 
     public Identifier Cast(string typeName)
         => DataType switch
         {
             DataTypes.Double when typeName != IntType && typeName != DoubleType
-                => throw new Exception($"Invalid type {IntType} or {DoubleType}. Expected a {typeName}"),
+                => throw new SyntaxParserException($"Invalid type {IntType} or {DoubleType}. Expected a {typeName}"),
             DataTypes.Int when typeName != IntType && typeName != DoubleType
-                => throw new Exception($"Invalid type {IntType} or {DoubleType}. Expected a {typeName}"),
+                => throw new SyntaxParserException($"Invalid type {IntType} or {DoubleType}. Expected a {typeName}"),
             DataTypes.String when typeName != StringType
-                => throw new Exception($"Invalid type string. Expected a {typeName}"),
+                => throw new SyntaxParserException($"Invalid type string. Expected a {typeName}"),
             DataTypes.Bool when typeName != BoolType
-                => throw new Exception($"Invalid type bool. Expected a {typeName}"),
+                => throw new SyntaxParserException($"Invalid type bool. Expected a {typeName}"),
             _ => TypeConverters.TryGetValue(typeName, out var cast)
                 ? cast(this)
-                : throw new Exception($"Unknown type: {typeName}")
+                : throw new SyntaxParserException($"Unknown type: {typeName}")
         };
 
 
@@ -99,7 +100,7 @@ public class Identifier(DataTypes dataType, object value)
         var @string = ToString();
         var success = double.TryParse(@string, out var result);
         if (!success)
-            throw new Exception($"Can't convert {value} to double");
+            throw new SyntaxParserException($"Can't convert {value} to double");
 
         return result;
     }
@@ -109,7 +110,7 @@ public class Identifier(DataTypes dataType, object value)
         var @string = ToString();
         var success = int.TryParse(@string, out var result);
         if (!success)
-            throw new Exception($"Can't convert {value} to int");
+            throw new SyntaxParserException($"Can't convert {value} to int");
 
         return result;
     }
@@ -119,7 +120,7 @@ public class Identifier(DataTypes dataType, object value)
         var @string = ToString();
         var success = bool.TryParse(@string, out var result);
         if (!success)
-            throw new Exception($"Can't convert {value} to bool");
+            throw new SyntaxParserException($"Can't convert {value} to bool");
 
         return result;
     }

@@ -142,11 +142,6 @@ public class Token
             TokenType.GreaterOrEqual or
             TokenType.Less or
             TokenType.LessOrEqual;
-    
-    public static bool IsLogicalOperatorType(TokenType type)
-        => type is
-            TokenType.And or
-            TokenType.Or;
 
     public override string ToString()
         => $"TokenType.{Type} => {Value} (Position: {Position})";

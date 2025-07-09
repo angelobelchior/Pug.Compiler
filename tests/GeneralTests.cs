@@ -147,7 +147,7 @@ public class GeneralTests(SharedValue sharedValue)
         string expression,
         string exceptionMessage)
     {
-        var exception = Assert.Throws<Exception>(() =>
+        var exception = Assert.Throws<SyntaxParserException>(() =>
         {
             var results = new Dictionary<string, Identifier>();
             var lexer = new Lexer(expression);
@@ -214,7 +214,7 @@ public class GeneralTests(SharedValue sharedValue)
     [Fact]
     public void Must_Throw_Exception_When_FunctionOrVariable_Not_Declared()
     {
-        var exception = Assert.Throws<Exception>(() =>
+        var exception = Assert.Throws<SyntaxParserException>(() =>
         {
             var results = new Dictionary<string, Identifier>();
             var lexer = new Lexer("int idade = 10");

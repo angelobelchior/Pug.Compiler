@@ -155,7 +155,7 @@ public class LexerTests
     {
         var lexer = new Lexer("\"test");
 
-        var exception = Assert.Throws<Exception>(() => lexer.ExtractTokens());
+        var exception = Assert.Throws<LexerException>(() => lexer.ExtractTokens());
         Assert.Equal("String not closed", exception.Message);
     }
 
@@ -164,7 +164,7 @@ public class LexerTests
     {
         var lexer = new Lexer("42..5");
 
-        var exception = Assert.Throws<Exception>(() => lexer.ExtractTokens());
+        var exception = Assert.Throws<LexerException>(() => lexer.ExtractTokens());
         Assert.Equal("Invalid number format: multiple dots", exception.Message);
     }
 
@@ -173,7 +173,7 @@ public class LexerTests
     {
         var lexer = new Lexer("@");
 
-        var exception = Assert.Throws<Exception>(() => lexer.ExtractTokens());
+        var exception = Assert.Throws<LexerException>(() => lexer.ExtractTokens());
         Assert.Equal("Unexpected character @", exception.Message);
     }
 }

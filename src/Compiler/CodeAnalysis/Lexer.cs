@@ -10,6 +10,8 @@ public class Lexer
     private int _currentPosition;
     private char _currentChar;
 
+    private readonly List<Token> _tokens = new();
+
     public Lexer(string text)
     {
         _text = text;
@@ -19,7 +21,7 @@ public class Lexer
 
     public List<Token> ExtractTokens()
     {
-        var tokens = new List<Token>();
+        _tokens.Clear();
 
         while (_currentChar != Token.END_OF_FILE)
         {
@@ -37,34 +39,34 @@ public class Lexer
 
             if (char.IsLetter(_currentChar))
             {
-                tokens.Add(ExtractKeyword());
+                _tokens.Add(ExtractKeyword());
                 continue;
             }
 
             if (_currentChar == Token.QUOTE)
             {
-                tokens.Add(ExtractString());
+                _tokens.Add(ExtractString());
                 continue;
             }
 
             if (_currentChar == Token.EQUAL && Peek() != Token.EQUAL)
             {
-                tokens.Add(Token.Assign(_currentPosition));
+                _tokens.Add(Token.Assign(_currentPosition));
                 Next();
                 continue;
             }
 
             if (_currentChar == Token.MINUS && char.IsDigit(Peek()) || char.IsDigit(_currentChar))
             {
-                tokens.Add(ExtractNumber());
+                _tokens.Add(ExtractNumber());
                 continue;
             }
 
-            tokens.Add(ExtractSymbols());
+            _tokens.Add(ExtractSymbols());
         }
 
-        tokens.Add(Token.EndOfFile(_currentPosition));
-        return tokens;
+        _tokens.Add(Token.EndOfFile(_currentPosition));
+        return _tokens;
     }
 
     private Token ExtractKeyword()
@@ -101,19 +103,19 @@ public class Lexer
         var position = _currentPosition;
 
         Next();
-        var stringValue = new StringBuilder();
-
+        var sb = new StringBuilder();
+        
         while (_currentChar != Token.QUOTE && _currentChar != Token.END_OF_FILE)
         {
-            stringValue.Append(_currentChar);
+            sb.Append(_currentChar);
             Next();
         }
 
         if (_currentChar != Token.QUOTE)
-            throw new Exception("String not closed");
+            throw LexerException("String not closed");
 
         Next();
-        return Token.String(position, stringValue.ToString());
+        return Token.String(position, sb.ToString());
     }
 
     private Token ExtractSymbols()
@@ -130,10 +132,11 @@ public class Lexer
             (Token.LESS, Token.EQUAL) => Token.LessOrEqual(position),
             _ => null
         };
-        
+
         if (doubleCharToken is not null)
         {
-            Next(2);
+            Next();
+            Next();
             return doubleCharToken;
         }
 
@@ -157,7 +160,7 @@ public class Lexer
             return tokenFactory(position);
         }
 
-        throw new Exception($"Unexpected character {_currentChar}");
+        throw LexerException($"Unexpected character {_currentChar}");
     }
 
     private Token ExtractNumber()
@@ -177,7 +180,7 @@ public class Lexer
             if (_currentChar == Token.DOT)
             {
                 if (hasDot)
-                    throw new Exception("Invalid number format: multiple dots");
+                    throw LexerException("Invalid number format: multiple dots");
 
                 hasDot = true;
             }
@@ -187,7 +190,7 @@ public class Lexer
         }
 
         if (hasDot && !double.TryParse(number.ToString(), out _))
-            throw new Exception($"Invalid number format: {number}");
+            throw LexerException($"Invalid number format: {number}");
 
         return Token.Number(position, number.ToString());
     }
@@ -212,9 +215,9 @@ public class Lexer
         return position < _text.Length ? _text[position] : Token.END_OF_FILE;
     }
 
-    private void Next(int count = 1)
+    private void Next()
     {
-        _currentPosition += count;
+        _currentPosition += 1;
         _currentChar = _currentPosition < _text.Length ? _text[_currentPosition] : Token.END_OF_FILE;
     }
 
@@ -232,4 +235,18 @@ public class Lexer
         if (_currentChar == Token.NEW_LINE)
             Next();
     }
+    
+    private LexerException LexerException(string message, int? position = null)
+        => new (message,
+            _tokens,
+            position ?? _currentPosition,
+            _currentChar);
+}
+
+public class LexerException(string message, List<Token> tokens, int currentPosition, char currentChar)
+    : Exception(message)
+{
+    public IReadOnlyList<Token> Tokens => tokens;
+    public int CurrentPosition => currentPosition;
+    public char CurrentChar => currentChar;
 }

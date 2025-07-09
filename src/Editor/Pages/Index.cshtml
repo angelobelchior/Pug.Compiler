@@ -25,6 +25,11 @@
             background-color: orange;
             border-bottom: 1px solid greenyellow;
         }
+
+        .error-line {
+            background-color: rgba(255, 0, 0, 0.15); /* vermelho claro */
+            border-left: 3px solid red;
+        }
     </style>
 </head>
 <body>
@@ -36,14 +41,21 @@
                  style="flex: 0 0 15vw; max-width: 15vw; background: #333; height: 100vh; padding-left: 25px; padding-top: 25px;overflow-y: auto;">
                 <div class="row">
                     <div class="col-12">
-                        <h5 class="text-light">Tokens</h5>
+                        <h5 id="tokensText" class="text-light">Tokens</h5>
                         <ul id="tokens" class="list-group" style="background-color:#cccccc;overflow-y: scroll;height: 500px;margin: 5px;">
                         </ul>
                     </div>
                 </div>
                 <div class="row mt-4">
                     <div class="col-12">
-                        <h5 class="text-light">Identifiers</h5>
+                        <h5 id="variablesText" class="text-light">Variables</h5>
+                        <ul id="variables" class="list-group" style="background-color:#cccccc;overflow-y: scroll;">
+                        </ul>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5 id="identifiersText"  class="text-light">Identifiers</h5>
                         <ul id="identifiers" class="list-group" style="background-color:#cccccc;overflow-y: scroll;">
                         </ul>
                     </div>
@@ -55,6 +67,8 @@
                 <div class="row mb-3">
                     <div class="col-12">
                         <div class="mb-2">
+                            <select id="code-samples" class="form-select" style="width: auto; display: inline-block; margin-right: 10px;">
+                            </select>
                             <button id="run-button" class="btn btn-primary">
                                 <i class="bi bi-play-fill"></i>
                             </button>

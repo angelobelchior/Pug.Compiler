@@ -17,6 +17,7 @@ app.UseAuthorization();
 app.UseStaticFiles();
 app.MapRazorPages();
 
-app.AddEndpoints();
+app.AddCompilerEndpoints();
+app.AddSamplesEndpoints();
 
 app.Run();
