@@ -24,7 +24,15 @@ A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará c
 **Funcionalidades:**
 - Suporte a if/then/else
 - Inclusão do operador `%` para obter o resto da divisão 
-- Inclusão da função interna `iif`
+- Inclusão das funções internas:
+  - Comparativas:
+    - `iif`, 
+  - Matemáticas:
+    - `log`, `exp`, `sin`, `cos`, `tan`, `atn`, `abs`, `sgn`
+  - Strings
+    - `left`, `right`, `mid`, `trim`, `trim_end`, `trim_start`
+  - Conversoras:
+    - `to_string`, `to_bool`, `to_int`, `to_double`
 - Melhoria no Pug Editor
   - Ajustes no Layout
   - Inclusão de um combo com samples de código

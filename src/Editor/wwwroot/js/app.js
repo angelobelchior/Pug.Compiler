@@ -24,8 +24,8 @@ function configureEditor() {
             tokenizer: {
                 root: [
                     [/\/\/.*/, 'comment'],
-                    [/\b(print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear|iif)\b/, 'function'],
-                    [/\b(true|false|func|if|else|end|then)\b/, 'keyword'],
+                    [/\b(log|exp|sin|cos|tan|atn|abs|sgn|left|right|mid|trim|trim_end|trim_start|to_string|to_bool|to_int|to_double|print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear|iif)\b/, 'function'],
+                    [/\b(true|false|func|if|else|end)\b/, 'keyword'],
                     [/\b(int|string|double|bool)\b/, 'type'],
                     [/\b(==|=|\+|-|\*|\/|%|&&|\|\|)\b/, 'operator'],
                     [/\b\d+\b/, 'number'],
