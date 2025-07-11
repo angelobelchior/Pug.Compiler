@@ -36,10 +36,10 @@ Nessa branch foi ajustado o código para que nomes de variáveis permitirem `_` 
 ```bash
 int idade = 18
 string nome = "Angelo"
-if idade >= 18 then
+if idade >= 18
     print("acesso permitido")
 else
-    if nome == "Angelo" then
+    if nome == "Angelo"
         print("acesso em avaliação")
     else
         print("acesso negado")
@@ -52,7 +52,7 @@ print("Fim do programa")
 
 //--
 
-if 4 % 2 == 0 then
+if 4 % 2 == 0
     print("É par")
 else
     print("É ímpar")
@@ -65,11 +65,7 @@ end
 int idade = 15
 string mensagem = iif(idade >= 18, "Acesso Liberado", "Acesso Negado")
 print(mensagem)
-
 ```
-
-![Pug Editor](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/3iubz6nnny17erb9nkvv.gif)
-
 ----
 
 ## Parte 4

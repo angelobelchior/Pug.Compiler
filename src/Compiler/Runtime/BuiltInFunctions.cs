@@ -86,6 +86,15 @@ public static class BuiltInFunctions
 
             return Identifier.None;
         },
+        
+        ["read"] = args =>
+        {
+            if (args.Count != 0)
+                throw SyntaxParserException("Invalid number of arguments for read", "read");
+
+            var response = Console.ReadLine();
+            return Identifier.Create(DataTypes.String, response);
+        },
 
         ["clear"] = _ =>
         {
