@@ -79,8 +79,6 @@ Pug.Compiler IDE:
 
 https://github.com/user-attachments/assets/baaca3a3-28bf-4860-b26b-2de4de4aa65a
 
-
-
 ----
 
 ## Parte 4
