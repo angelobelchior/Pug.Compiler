@@ -87,9 +87,8 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("false!=false", "False")]
     [InlineData("1 == (2*3)", "False")]
     [InlineData("4 == pow(2)", "True")]
-    [InlineData("3 == (pow(2) - 1)", "True")]
-    [InlineData("4 == (pow(2) - 1)", "False")]
     [InlineData("3 == pow(2) - 1", "True")]
+    [InlineData("4 == pow(2) - 1", "False")]
     [InlineData("true && true", "True")]
     [InlineData("true && false", "False")]
     [InlineData("false && false", "False")]
@@ -148,7 +147,7 @@ public class GeneralTests(SharedValue sharedValue)
         string expression,
         string exceptionMessage)
     {
-        var exception = Assert.Throws<Exception>(() =>
+        var exception = Assert.Throws<SyntaxParserException>(() =>
         {
             var results = new Dictionary<string, Identifier>();
             var lexer = new Lexer(expression);
@@ -170,8 +169,8 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("true || false", "True")]
     [InlineData("false || false", "False")]
     [InlineData("false || true", "True")]
-    [InlineData("pow(2) == 4 && min(3,2) == 2", "True")]
-    [InlineData("sqrt(25) == 5 && max(1,7) == 7", "True")]
+    [InlineData("pow(2)  == 4 && min (3, 2) == 2", "True")]
+    [InlineData("sqrt(25) == 5 && max(1, 7) == 7", "True")]
     [InlineData("len(\"abc\") == 3 && round(2.7) == 3", "True")]
     [InlineData("pow(2) == 5 && sqrt(16) == 4", "False")]
     [InlineData("min(8,3) == 8 || max(1,7) == 10", "False")]
@@ -215,7 +214,7 @@ public class GeneralTests(SharedValue sharedValue)
     [Fact]
     public void Must_Throw_Exception_When_FunctionOrVariable_Not_Declared()
     {
-        var exception = Assert.Throws<Exception>(() =>
+        var exception = Assert.Throws<SyntaxParserException>(() =>
         {
             var results = new Dictionary<string, Identifier>();
             var lexer = new Lexer("int idade = 10");
@@ -233,7 +232,176 @@ public class GeneralTests(SharedValue sharedValue)
             _ = syntaxParser.Evaluate();
         });
 
-        Assert.Equal($"Unknown identifier: y", exception.Message);
+        Assert.Equal("Unknown identifier: y", exception.Message);
+    }
+
+    [InlineData(
+        """
+        int idade = 18
+        string nome = "Angelo"
+        if idade >= 18
+            string a = "acesso permitido"
+        else
+            if nome == "Angelo"
+                string b = "acesso em avaliação"
+            else
+                string c = "acesso negado"
+            end
+        end
+        string d = "Fim do programa"
+        """,
+        "18", "Angelo", "acesso permitido", "Fim do programa"
+    )]
+    
+    [InlineData(
+        """
+        int idade = 41
+        if idade == 41
+            string a = "igual"
+        else
+            string a = "diferente"
+        end
+        """,
+        "41", "igual"
+    )]
+    
+    [InlineData(
+        """
+        int idade = 22
+        if idade == 41
+           string a = "igual"
+        else
+            string b = "diferente"
+        end
+        """,
+        "22", "diferente"
+    )]
+    
+    [InlineData(
+        """
+        int idade = 30
+        bool cadastrado = true
+        if idade >= 18 && cadastrado == true
+            string a = "acesso liberado"
+        else
+            string b = "acesso negado"
+        end
+        """,
+        "30", "True", "acesso liberado"
+    )]
+    
+    [InlineData(
+        """
+        int a = 5
+        int b = 10
+        if (a + b) == 15
+            string c = "soma correta"
+        else
+            string d = "soma incorreta"
+        end
+        """,
+        "5", "10", "soma correta"
+    )]
+    
+    [InlineData(
+        """
+        int idade = 15
+        if idade >= 0
+            if idade < 12
+                string a = "criança"
+            else
+                if idade < 18
+                    string b = "adolescente"
+                else
+                    string c = "adulto"
+                end
+            end
+        else
+            string d = "idade inválida"
+        end
+        """,
+        "15", "adolescente"
+    )]
+    
+    [InlineData(
+        """
+        int idade = 10
+        if idade >= 0
+            if idade < 12
+                string a = "criança"
+            else
+                if idade < 18
+                    string b = "adolescente"
+                else
+                    string c = "adulto"
+                end
+            end
+        else
+            string d = "idade inválida"
+        end
+        """,
+        "10", "criança"
+    )]
+    
+    [InlineData(
+        """
+        int idade = 19
+        if idade >= 0
+            if idade < 12
+                string a = "criança"
+            else
+                if idade < 18
+                    string b = "adolescente"
+                else
+                    string c = "adulto"
+                end
+            end
+        else
+            string d = "idade inválida"
+        end
+        """,
+        "19", "adulto"
+    )]
+    
+    [InlineData(
+        """
+        int idade = -10
+        if idade >= 0
+            if idade < 12
+                string a = "criança"
+            else
+                if idade < 18
+                    string b = "adolescente"
+                else
+                    string c = "adulto"
+                end
+            end
+        else
+            string d = "idade inválida"
+        end
+        """,
+        "-10", "idade inválida"
+    )]
+    
+    [Theory]
+    public void Must_Execute_If_Statement(
+        string code,
+        params string[] variables)
+    {
+        var identifiers = new Dictionary<string, Identifier>();
+        var lexer = new Lexer(code);
+        var tokens = lexer.ExtractTokens();
+    
+        var syntaxParser = new SyntaxParser(identifiers, tokens);
+        _ = syntaxParser.Evaluate();
+    
+        Assert.Equal(variables.Length, identifiers.Count);
+        for (var i = 0; i < variables.Length; i++)
+        {
+            var a = variables[i];
+            var b = identifiers.Values.ElementAt(i).Value.ToString();
+            Assert.Equal(a, b);
+        }
     }
 }
 
@@ -253,7 +421,7 @@ public class InlineDataOrderer : ITestCaseOrderer
 public class SharedValue
 {
     public Dictionary<string, Identifier> Results { get; } = new();
-};
+}
 
 [CollectionDefinition(nameof(SharedCollection))]
 public class SharedCollection : ICollectionFixture<SharedValue>;

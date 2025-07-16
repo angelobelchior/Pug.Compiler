@@ -12,6 +12,7 @@ public enum TokenType
     Minus,
     Multiply,
     Divide,
+    Remainder,
 
     Assign,
 
@@ -25,7 +26,6 @@ public enum TokenType
     DataType,
 
     If,
-    Then,
     Else,
     End,
     

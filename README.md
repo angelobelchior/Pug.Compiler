@@ -2,15 +2,78 @@
 
 [![.NET](https://github.com/angelobelchior/Pug.Compiler/actions/workflows/dotnet.yml/badge.svg)](https://github.com/angelobelchior/Pug.Compiler/actions/workflows/dotnet.yml)
 
-Esse repositório faz parte da série [Reinventando a Roda: Criando um compilador em csharp](https://dev.to/angelobelchior/series/31549) na qual vamos construir um compilador do zero em **csharp**.
+Esse repositório faz parte da série [Criando um compilador em csharp](https://dev.to/angelobelchior/series/31549) na qual vamos construir um compilador do zero em **csharp**.
 
 Essa construção será dividida em partes e cada parte terá um post e uma branch específica.
 
 Cada post vai conter a explicação e implementação de uma ou mais funcionalidades do compilador e sempre estará associado a uma branch (parte1, parte2, etc.).
 
 
-A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 4](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-4-304d).
+A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 5](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-5-2hoi).
 
+----
+
+## Parte 5
+
+**Link para o Post:**
+- https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-5-2hoi
+
+**Link para a Branch:**
+- https://github.com/angelobelchior/Pug.Compiler/tree/parte5
+
+**Funcionalidades:**
+- Suporte a if/then/else
+- Inclusão do operador `%` para obter o resto da divisão 
+- Inclusão das funções internas:
+  - Comparativas:
+    - `iif`, 
+  - Matemáticas:
+    - `log`, `exp`, `sin`, `cos`, `tan`, `atn`, `abs`, `sgn`
+  - Strings
+    - `left`, `right`, `mid`, `trim`, `trim_end`, `trim_start`
+  - Conversoras:
+    - `to_string`, `to_bool`, `to_int`, `to_double`
+- Melhoria no Pug Editor
+  - Ajustes no Layout
+  - Inclusão de um combo com samples de código
+  - Ao clicar em um _token_ (no painel a esquerda) é possível visualizar no editor o código-fonte que gerou aquele _token_
+  - Caso ocorra algum erro de compilação, o editor irá destacar a linha do erro
+
+Nessa branch foi ajustado o código para que nomes de variáveis permitirem `_` e números no meio da palavra: Exemplo: `int idade_1 = 41`
+
+```bash
+int idade = 18
+string nome = "Angelo"
+if idade >= 18
+    print("acesso permitido")
+else
+    if nome == "Angelo"
+        print("acesso em avaliação")
+    else
+        print("acesso negado")
+    end
+end
+print("Fim do programa")
+
+> acesso permitido
+> Fim do programa
+
+//--
+
+if 4 % 2 == 0
+    print("É par")
+else
+    print("É ímpar")
+end
+
+> É par
+
+//--
+
+int idade = 15
+string mensagem = iif(idade >= 18, "Acesso Liberado", "Acesso Negado")
+print(mensagem)
+```
 ----
 
 ## Parte 4

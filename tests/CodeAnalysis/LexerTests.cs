@@ -9,7 +9,7 @@ public class LexerTests
     [Fact]
     public void ExtractTokens_ShouldExtractTokens()
     {
-        var lexer = new Lexer("42 true false \"olá mundo\" + - * / = ( ) pow , int x -84.25 if then else end == != > >= < <= && || //ignoro isso");
+        var lexer = new Lexer("42 true false \"olá mundo\" + - * / = ( ) pow , int x -84.25 if % else end == != > >= < <= && || //ignoro isso");
         var tokens = lexer.ExtractTokens();
 
         Assert.Equal(29, tokens.Count);
@@ -82,52 +82,52 @@ public class LexerTests
         Assert.Equal(59, tokens[16].Position);
         Assert.Equal("if", tokens[16].Value);
 
-        Assert.Equal(TokenType.Then, tokens[17].Type);
+        Assert.Equal(TokenType.Remainder, tokens[17].Type);
         Assert.Equal(62, tokens[17].Position);
-        Assert.Equal("then", tokens[17].Value);
+        Assert.Equal("%", tokens[17].Value);
         
         Assert.Equal(TokenType.Else, tokens[18].Type);
-        Assert.Equal(67, tokens[18].Position);
+        Assert.Equal(64, tokens[18].Position);
         Assert.Equal("else", tokens[18].Value);
         
         Assert.Equal(TokenType.End, tokens[19].Type);
-        Assert.Equal(72, tokens[19].Position);
+        Assert.Equal(69, tokens[19].Position);
         Assert.Equal("end", tokens[19].Value);
         
         Assert.Equal(TokenType.Equal, tokens[20].Type);
-        Assert.Equal(76, tokens[20].Position);
+        Assert.Equal(73, tokens[20].Position);
         Assert.Equal("==", tokens[20].Value);
         
         Assert.Equal(TokenType.NotEqual, tokens[21].Type);
-        Assert.Equal(79, tokens[21].Position);
+        Assert.Equal(76, tokens[21].Position);
         Assert.Equal("!=", tokens[21].Value);
         
         Assert.Equal(TokenType.Greater, tokens[22].Type);
-        Assert.Equal(82, tokens[22].Position);
+        Assert.Equal(79, tokens[22].Position);
         Assert.Equal(">", tokens[22].Value);
         
         Assert.Equal(TokenType.GreaterOrEqual, tokens[23].Type);
-        Assert.Equal(84, tokens[23].Position);
+        Assert.Equal(81, tokens[23].Position);
         Assert.Equal(">=", tokens[23].Value);
         
         Assert.Equal(TokenType.Less, tokens[24].Type);
-        Assert.Equal(87, tokens[24].Position);
+        Assert.Equal(84, tokens[24].Position);
         Assert.Equal("<", tokens[24].Value);
         
         Assert.Equal(TokenType.LessOrEqual, tokens[25].Type);
-        Assert.Equal(89, tokens[25].Position);
+        Assert.Equal(86, tokens[25].Position);
         Assert.Equal("<=", tokens[25].Value);
         
         Assert.Equal(TokenType.And, tokens[26].Type);
-        Assert.Equal(92, tokens[26].Position);
+        Assert.Equal(89, tokens[26].Position);
         Assert.Equal("&&", tokens[26].Value);
         
         Assert.Equal(TokenType.Or, tokens[27].Type);
-        Assert.Equal(95, tokens[27].Position);
+        Assert.Equal(92, tokens[27].Position);
         Assert.Equal("||", tokens[27].Value);
         
         Assert.Equal(TokenType.EndOfFile, tokens[^1].Type);
-        Assert.Equal(111, tokens[^1].Position);
+        Assert.Equal(108, tokens[^1].Position);
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public class LexerTests
     {
         var lexer = new Lexer("\"test");
 
-        var exception = Assert.Throws<Exception>(() => lexer.ExtractTokens());
+        var exception = Assert.Throws<LexerException>(() => lexer.ExtractTokens());
         Assert.Equal("String not closed", exception.Message);
     }
 
@@ -164,7 +164,7 @@ public class LexerTests
     {
         var lexer = new Lexer("42..5");
 
-        var exception = Assert.Throws<Exception>(() => lexer.ExtractTokens());
+        var exception = Assert.Throws<LexerException>(() => lexer.ExtractTokens());
         Assert.Equal("Invalid number format: multiple dots", exception.Message);
     }
 
@@ -173,7 +173,7 @@ public class LexerTests
     {
         var lexer = new Lexer("@");
 
-        var exception = Assert.Throws<Exception>(() => lexer.ExtractTokens());
-        Assert.Equal($"Unexpected character @", exception.Message);
+        var exception = Assert.Throws<LexerException>(() => lexer.ExtractTokens());
+        Assert.Equal("Unexpected character @", exception.Message);
     }
 }

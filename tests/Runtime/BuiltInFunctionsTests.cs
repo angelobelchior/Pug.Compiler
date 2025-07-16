@@ -32,7 +32,7 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "nonexistent");
         var args = new List<Identifier>();
 
-        var exception = Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        var exception = Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
         Assert.Equal("Function nonexistent not found", exception.Message);
     }
 
@@ -54,7 +54,7 @@ public class BuiltInFunctionsTests
         var token = Token.Function(0, "sqrt");
         var args = new List<Identifier>();
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -126,7 +126,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -156,7 +156,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -198,7 +198,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -256,7 +256,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -285,7 +285,7 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
     
     [Fact]
@@ -310,6 +310,6 @@ public class BuiltInFunctionsTests
             Identifier.Create(DataTypes.Double, 3),
         ];
 
-        Assert.Throws<Exception>(() => BuiltInFunctions.Invoke(token.Value, args));
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke(token.Value, args));
     }
 }

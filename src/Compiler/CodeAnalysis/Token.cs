@@ -14,6 +14,7 @@ public class Token
     public const char MINUS = '-';
     public const char MULTIPLY = '*';
     public const char DIVIDER = '/';
+    public const char REMAINDER = '%';
     public const char EQUAL = '=';
 
     public const char OPEN_PARENTHESIS = '(';
@@ -23,7 +24,7 @@ public class Token
     public const string FALSE = "false";
 
     public const string IF = "if";
-    public const string THEN = "then";
+    // public const string THEN = "then";
     public const string ELSE = "else";
     public const string END = "end";
     public const char GREATER = '>';
@@ -74,6 +75,9 @@ public class Token
 
     public static Token Divide(int position)
         => new(TokenType.Divide, DIVIDER, position);
+    
+    public static Token Remainder(int position)
+        => new(TokenType.Remainder, REMAINDER, position);
 
     public static Token Assign(int position)
         => new(TokenType.Assign, EQUAL, position);
@@ -95,10 +99,7 @@ public class Token
 
     public static Token If(int position)
         => new(TokenType.If, IF, position);
-
-    public static Token Then(int position)
-        => new(TokenType.Then, THEN, position);
-
+    
     public static Token Else(int position)
         => new(TokenType.Else, ELSE, position);
 
@@ -138,11 +139,6 @@ public class Token
             TokenType.GreaterOrEqual or
             TokenType.Less or
             TokenType.LessOrEqual;
-    
-    public static bool IsLogicalOperatorType(TokenType type)
-        => type is
-            TokenType.And or
-            TokenType.Or;
 
     public override string ToString()
         => $"TokenType.{Type} => {Value} (Position: {Position})";
