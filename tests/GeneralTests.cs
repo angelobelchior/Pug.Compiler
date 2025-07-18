@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Pug.Compiler.CodeAnalysis;
 using Pug.Compiler.Runtime;
 using Xunit.Abstractions;
@@ -7,6 +8,7 @@ using Xunit.Sdk;
 
 namespace Pug.Compiler.Tests;
 
+[ExcludeFromCodeCoverage]
 [TestCaseOrderer("Pug.Compiler.Tests." + nameof(InlineDataOrderer), "Pug.Compiler.Tests")]
 [Collection(nameof(SharedCollection))]
 public class GeneralTests(SharedValue sharedValue)
@@ -15,9 +17,9 @@ public class GeneralTests(SharedValue sharedValue)
 
     [Theory]
     [InlineData(1, "int x = 5", "5")]
-    [InlineData(2, "double y = 3.14", "3.14")]
+    [InlineData(2, "double y = 3.14", 3.14)]
     [InlineData(3, "int z = x + 10", "15")]
-    [InlineData(4, "double result = y * 2", "6.28")]
+    [InlineData(4, "double result = y * 2", 6.28)]
     [InlineData(5, "int division = 10 / 2", "5")]
     [InlineData(6, "double complex = (5 + 3) * 2 - 4 / 2", "14")]
     [InlineData(7, "string nome = \"Angelo\"", "Angelo")]
@@ -54,7 +56,7 @@ public class GeneralTests(SharedValue sharedValue)
         int order,
 #pragma warning restore xUnit1026
         string expression,
-        string expectedResult)
+        object expectedResult)
     {
         var lexer = new Lexer(expression);
         var tokens = lexer.ExtractTokens();
@@ -62,10 +64,10 @@ public class GeneralTests(SharedValue sharedValue)
         var syntaxParser = new SyntaxParser(_expressionResults, tokens);
         var result = syntaxParser.Evaluate();
 
-        if (expectedResult == "\0")
+        if (expectedResult.Equals("\0"))
             Assert.Empty(result);
         else
-            Assert.Equal(expectedResult, result[0].Value.ToString());
+            Assert.Equal(expectedResult.ToString(), result[0].Value.ToString());
     }
 
     [Theory]
@@ -161,45 +163,45 @@ public class GeneralTests(SharedValue sharedValue)
     }
 
     [Theory]
-    [InlineData("true && true", "True")]
-    [InlineData("true && false", "False")]
-    [InlineData("false && false", "False")]
-    [InlineData("false && true", "False")]
-    [InlineData("true || true", "True")]
-    [InlineData("true || false", "True")]
-    [InlineData("false || false", "False")]
-    [InlineData("false || true", "True")]
-    [InlineData("pow(2)  == 4 && min (3, 2) == 2", "True")]
-    [InlineData("sqrt(25) == 5 && max(1, 7) == 7", "True")]
-    [InlineData("len(\"abc\") == 3 && round(2.7) == 3", "True")]
-    [InlineData("pow(2) == 5 && sqrt(16) == 4", "False")]
-    [InlineData("min(8,3) == 8 || max(1,7) == 10", "False")]
-    [InlineData("pow(3) == 9 || len(\"dog\") == 4", "True")]
-    [InlineData("sqrt(36) == 7 || round(1.4) == 1", "True")]
-    [InlineData("upper(\"dog\") == \"DOG\" && lower(\"CAT\") == \"cat\"", "True")]
-    [InlineData("replace(\"abc\", \"b\", \"d\") == \"abc\" || pow(2,3) == 8", "True")]
-    [InlineData("round(2.51) == 3 && len(\"pug\") == 4", "False")]
-    [InlineData("1 == 1", "True")]
-    [InlineData("1 != 2", "True")]
-    [InlineData("3 > 2", "True")]
-    [InlineData("4 >= 4", "True")]
-    [InlineData("5 < 10", "True")]
-    [InlineData("7 <= 7", "True")]
-    [InlineData("(2 < 3) && (4 > 1)", "True")]
-    [InlineData("(3 == 3) || (6 != 6)", "True")]
-    [InlineData("sqrt(25) == 5", "True")]
-    [InlineData("pow(3) == 9", "True")]
-    [InlineData("min(8, 3) == 8", "False")]
-    [InlineData("max(1, 7) > 10", "False")]
-    [InlineData("round(2.49) == 2", "True")]
-    [InlineData("round(2.51) == 2", "False")]
-    [InlineData("len(\"pug\") == 3", "True")]
-    [InlineData("replace(\"abc\", \"b\", \"d\") == \"adc\"",  "True")]
-    [InlineData("upper(\"dog\") == \"DOG\"", "True")]
-    [InlineData("lower(\"CAT\") != \"cat\"", "False")]
+    [InlineData("true && true", true)]
+    [InlineData("true && false", false)]
+    [InlineData("false && false", false)]
+    [InlineData("false && true", false)]
+    [InlineData("true || true", true)]
+    [InlineData("true || false", true)]
+    [InlineData("false || false", false)]
+    [InlineData("false || true", true)]
+    [InlineData("pow(2)  == 4 && min (3, 2) == 2", true)]
+    [InlineData("sqrt(25) == 5 && max(1, 7) == 7", true)]
+    [InlineData("len(\"abc\") == 3 && round(2.7) == 3", true)]
+    [InlineData("pow(2) == 5 && sqrt(16) == 4", false)]
+    [InlineData("min(8,3) == 8 || max(1,7) == 10", false)]
+    [InlineData("pow(3) == 9 || len(\"dog\") == 4", true)]
+    [InlineData("sqrt(36) == 7 || round(1.4) == 1", true)]
+    [InlineData("upper(\"dog\") == \"DOG\" && lower(\"CAT\") == \"cat\"", true)]
+    [InlineData("replace(\"abc\", \"b\", \"d\") == \"abc\" || pow(2,3) == 8", true)]
+    [InlineData("round(2.51) == 3 && len(\"pug\") == 4", false)]
+    [InlineData("1 == 1", true)]
+    [InlineData("1 != 2", true)]
+    [InlineData("3 > 2", true)]
+    [InlineData("4 >= 4", true)]
+    [InlineData("5 < 10", true)]
+    [InlineData("7 <= 7", true)]
+    [InlineData("(2 < 3) && (4 > 1)", true)]
+    [InlineData("(3 == 3) || (6 != 6)", true)]
+    [InlineData("sqrt(25) == 5", true)]
+    [InlineData("pow(3) == 9", true)]
+    [InlineData("min(8, 3) == 8", false)]
+    [InlineData("max(1, 7) > 10", false)]
+    [InlineData("round(2.49) == 2", true)]
+    [InlineData("round(2.51) == 2", false)]
+    [InlineData("len(\"pug\") == 3", true)]
+    [InlineData("replace(\"abc\", \"b\", \"d\") == \"adc\"",  true)]
+    [InlineData("upper(\"dog\") == \"DOG\"", true)]
+    [InlineData("lower(\"CAT\") != \"cat\"", false)]
     public void Must_Parse_Logical_Expressions(
         string expression,
-        string expectedResult)
+        bool expectedResult)
     {
         var lexer = new Lexer(expression);
         var tokens = lexer.ExtractTokens();
@@ -208,7 +210,7 @@ public class GeneralTests(SharedValue sharedValue)
         var result = syntaxParser.Evaluate();
 
         Assert.Single(result);
-        Assert.Equal(expectedResult, result[0].Value.ToString());
+        Assert.Equal(expectedResult, result[0].Value);
     }
 
     [Fact]
@@ -405,6 +407,7 @@ public class GeneralTests(SharedValue sharedValue)
     }
 }
 
+[ExcludeFromCodeCoverage]
 public class InlineDataOrderer : ITestCaseOrderer
 {
     public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases)
@@ -418,10 +421,12 @@ public class InlineDataOrderer : ITestCaseOrderer
         });
 }
 
+[ExcludeFromCodeCoverage]
 public class SharedValue
 {
     public Dictionary<string, Identifier> Results { get; } = new();
 }
 
+[ExcludeFromCodeCoverage]
 [CollectionDefinition(nameof(SharedCollection))]
 public class SharedCollection : ICollectionFixture<SharedValue>;

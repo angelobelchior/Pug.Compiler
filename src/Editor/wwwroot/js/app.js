@@ -124,7 +124,7 @@ function setVariables(result) {
         const li = createLi(`${variable.dataType} ${variable.name} ${variable.value}`, null);
         variables.append(li);
     }
-    document.getElementById("variablesText").innerHTML = `Tokens (${result.variables.length})`;
+    document.getElementById("variablesText").innerHTML = `Variables (${result.variables.length})`;
 }
 
 function setIdentifiers(result) {

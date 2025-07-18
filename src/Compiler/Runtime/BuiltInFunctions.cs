@@ -6,7 +6,6 @@ public static class BuiltInFunctions
 {
     private static readonly Dictionary<string, Func<List<Identifier>, Identifier>> Functions = new()
     {
-        //Funções matemáticas
         ["log"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Double, Math.Log(args[0].ToDouble()))
             : throw SyntaxParserException("Invalid number of arguments for log", "log"),
@@ -73,7 +72,6 @@ public static class BuiltInFunctions
             _ => throw SyntaxParserException("Invalid number of arguments for random", "random")
         },
 
-        // Funções de string
         ["upper"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.String, args[0].ToString().ToUpperInvariant())
             : throw SyntaxParserException("Invalid number of arguments for upper", "upper"),
@@ -97,16 +95,16 @@ public static class BuiltInFunctions
             _ => throw SyntaxParserException("Invalid number of arguments for substr", "substr")
         },
         
-        ["left"] = args => args.Count == 1
-            ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(0, args[0].ToInt()))
+        ["left"] = args => args.Count == 2
+            ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(0, args[1].ToInt()))
             : throw SyntaxParserException("Invalid number of arguments for left", "left"),
         
-        ["right"] = args => args.Count == 1
-            ? Identifier.Create(DataTypes.String, args[0].ToString().Length)
+        ["right"] = args => args.Count == 2
+            ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(args[0].ToString().Length - args[1].ToInt()))
             : throw SyntaxParserException("Invalid number of arguments for right", "right"),
         
-        ["mid"] = args => args.Count == 2
-            ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(args[0].ToInt(), args[1].ToInt()))
+        ["mid"] = args => args.Count == 3
+            ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(args[1].ToInt(), args[2].ToInt()))
             : throw SyntaxParserException("Invalid number of arguments for mid", "mid"),
         
         ["trim"] = args => args.Count == 1
@@ -121,13 +119,12 @@ public static class BuiltInFunctions
             ? Identifier.Create(DataTypes.String, args[0].ToString().TrimStart())
             : throw SyntaxParserException("Invalid number of arguments for trim", "trim_start"),
         
-        // Conversores
         ["to_str"] = args => args.Count == 1
-            ? Identifier.Create(DataTypes.String, args[0].ToString())
+            ? Identifier.Create(DataTypes.String, args[0])
             : throw SyntaxParserException("Invalid number of arguments for to_string", "to_str"),
 
         ["to_bool"] = args => args.Count == 1
-            ? Identifier.Create(DataTypes.Bool, args[0].ToBool())
+            ? Identifier.Create(DataTypes.Bool, args[0])
             : throw SyntaxParserException("Invalid number of arguments for to_bool", "to_bool"),
         
         ["to_int"] = args => args.Count == 1
@@ -135,10 +132,9 @@ public static class BuiltInFunctions
             : throw SyntaxParserException("Invalid number of arguments for int", "to_int"),
         
         ["to_double"] = args => args.Count == 1
-            ? Identifier.Create(DataTypes.Double, args[0].ToDouble())
-            : throw SyntaxParserException("Invalid number of arguments for int", "to_double"),
+            ? Identifier.Create(DataTypes.Double, args[0])
+            : throw SyntaxParserException("Invalid number of arguments for double", "to_double"),
 
-        // Outras funções
         ["iif"] = args =>
         {
             if (args.Count != 3)

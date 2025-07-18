@@ -105,7 +105,7 @@ public class IdentifierTests
         var result = Identifier.FromToken(token);
 
         Assert.Equal(DataTypes.Double, result.DataType);
-        Assert.Equal("42.5", result.Value);
+        Assert.Equal(42.5, result.Value);
     }
 
     [Fact]
@@ -115,13 +115,13 @@ public class IdentifierTests
         var result = Identifier.FromToken(token);
 
         Assert.Equal(DataTypes.Bool, result.DataType);
-        Assert.Equal("True", result.Value);
+        Assert.Equal(true, result.Value);
         
          token = Token.Bool(2, false.ToString());
          result = Identifier.FromToken(token);
 
         Assert.Equal(DataTypes.Bool, result.DataType);
-        Assert.Equal("False", result.Value);
+        Assert.Equal(false, result.Value);
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class IdentifierTests
         var castedValue = result.Cast("double");
 
         Assert.Equal(DataTypes.Double, castedValue.DataType);
-        Assert.Equal(42.5, castedValue.ToDouble());
+        Assert.Equal(42.5, castedValue.Value);
     }
 
     [Fact]
@@ -173,16 +173,105 @@ public class IdentifierTests
     }
     
     [Theory]
-    [InlineData("int", true)]
-    [InlineData("double", true)]
-    [InlineData("bool", true)]
-    [InlineData("string", true)]
-    [InlineData("unknown", false)]
-    [InlineData("", false)]
-    public void ContainDataType_ShouldReturnExpectedResult(string type, bool expected)
+    [InlineData("int", DataTypes.Int, 0)]
+    [InlineData("double", DataTypes.Double, 0.0)]
+    [InlineData("bool", DataTypes.Bool, false)]
+    [InlineData("string", DataTypes.String, "")]
+    public void Default_ShouldReturnCorrectIdentifier(string typeName, DataTypes expectedType, object expectedValue)
     {
-        var result = Identifier.ContainsDataType(type);
+        // Act
+        var result = Identifier.Default(typeName);
 
-        Assert.Equal(expected, result);
+        // Assert
+        Assert.Equal(expectedType, result.DataType);
+        Assert.Equal(expectedValue, result.Value);
+    }
+  
+    [Fact]
+    public void Default_ShouldThrowExceptionForInvalidType()
+    {
+        // Arrange
+        var invalidType = "invalid";
+
+        // Act & Assert
+        var exception = Assert.Throws<SyntaxParserException>(() => Identifier.Default(invalidType));
+        Assert.Equal($"Invalid data type: {invalidType}", exception.Message);
+    }
+    
+    [Fact]
+    public void Value_ShouldReturnInt_WhenDataTypeIsInt()
+    {
+        // Arrange
+        var identifier = new Identifier(DataTypes.Int, 42);
+
+        // Act
+        var value = identifier.Value;
+
+        // Assert
+        Assert.Equal(42, value);
+    }
+
+    [Fact]
+    public void Value_ShouldReturnDouble_WhenDataTypeIsDouble()
+    {
+        // Arrange
+        var identifier = new Identifier(DataTypes.Double, 42.5);
+
+        // Act
+        var value = identifier.Value;
+
+        // Assert
+        Assert.Equal(42.5, value);
+    }
+
+    [Fact]
+    public void Value_ShouldReturnBoolAsString_WhenDataTypeIsBool()
+    {
+        // Arrange
+        var identifier = new Identifier(DataTypes.Bool, true);
+
+        // Act
+        var value = identifier.Value;
+
+        // Assert
+        Assert.Equal(true, value);
+    }
+
+    [Fact]
+    public void Value_ShouldReturnString_WhenDataTypeIsString()
+    {
+        // Arrange
+        var identifier = new Identifier(DataTypes.String, "test");
+
+        // Act
+        var value = identifier.Value;
+
+        // Assert
+        Assert.Equal("test", value);
+    }
+
+    [Fact]
+    public void Value_ShouldReturnNone_WhenDataTypeIsNone()
+    {
+        // Arrange
+        var identifier = new Identifier(DataTypes.None, None.Value);
+
+        // Act
+        var value = identifier.Value;
+
+        // Assert
+        Assert.Equal(Identifier.None, value);
+    }
+    
+    [Fact]
+    public void Value_ShouldThrowException_WhenDataTypeIsInvalid()
+    {
+        // Arrange
+        var identifier = new Identifier((DataTypes)9999, None.Value);
+
+        Assert.Throws<SyntaxParserException>(() =>
+        {
+            _ = identifier.Value;
+        });
     }
 }

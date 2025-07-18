@@ -31,8 +31,8 @@ public class Identifier(DataTypes dataType, object value)
         => DataType switch
         {
             DataTypes.Int => ToInt(),
-            DataTypes.Double => ToDouble().ToString(CultureInfo.InvariantCulture),
-            DataTypes.Bool => ToBool().ToString(),
+            DataTypes.Double => ToDouble(),
+            DataTypes.Bool => ToBool(),
             DataTypes.String => ToString(),
             DataTypes.None => Identifier.None,
             _ => throw new SyntaxParserException($"Invalid data type: {DataType}")
@@ -72,7 +72,7 @@ public class Identifier(DataTypes dataType, object value)
         => typeName switch
         {
             IntType => new Identifier(DataTypes.Int, 0),
-            DoubleType => new Identifier(DataTypes.Double, 0),
+            DoubleType => new Identifier(DataTypes.Double, 0.0),
             BoolType => new Identifier(DataTypes.Bool, false),
             StringType => new Identifier(DataTypes.String, string.Empty),
             _ => throw new SyntaxParserException($"Invalid data type: {typeName}")
@@ -94,11 +94,18 @@ public class Identifier(DataTypes dataType, object value)
                 : throw new SyntaxParserException($"Unknown type: {typeName}")
         };
 
-
     public double ToDouble()
     {
-        var @string = ToString();
-        var success = double.TryParse(@string, out var result);
+        if (value is double d)
+            return d;
+
+        var @string = value.ToString();
+        var success = double.TryParse(
+            @string,
+            NumberStyles.Any,
+            CultureInfo.InvariantCulture,
+            out var result);
+
         if (!success)
             throw new SyntaxParserException($"Can't convert {value} to double");
 
@@ -107,6 +114,9 @@ public class Identifier(DataTypes dataType, object value)
 
     public int ToInt()
     {
+        if (value is int i)
+            return i;
+        
         var @string = ToString();
         var success = int.TryParse(@string, out var result);
         if (!success)
@@ -117,6 +127,9 @@ public class Identifier(DataTypes dataType, object value)
 
     public bool ToBool()
     {
+        if (value is bool b)
+            return b;
+        
         var @string = ToString();
         var success = bool.TryParse(@string, out var result);
         if (!success)

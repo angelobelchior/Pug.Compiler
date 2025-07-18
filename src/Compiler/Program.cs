@@ -68,8 +68,8 @@ static void PrintTokens(IEnumerable<Token> tokens)
         Console.WriteLine(token);
 }
 
-namespace Pug.Compiler
+[ExcludeFromCodeCoverage]
+public partial class Program
 {
-    [ExcludeFromCodeCoverage]
-    public partial class Program;
+    
 }
