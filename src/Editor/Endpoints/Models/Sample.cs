@@ -1,5 +1,6 @@
 namespace Pug.Compiler.Editor.Endpoints.Models;
 
+[ExcludeFromCodeCoverage]
 public record Sample(string Title, string Code)
 {
     public static IReadOnlyList<Sample> CreateSamples()

@@ -168,8 +168,11 @@ public static class BuiltInFunctions
             return Identifier.Create(DataTypes.String, response);
         },
 
-        ["clear"] = _ =>
+        ["clear"] = args =>
         {
+            if (args.Count != 0)
+                throw SyntaxParserException("Invalid number of arguments for clear", "clear");
+            
             Console.Clear();
 
             return Identifier.None;

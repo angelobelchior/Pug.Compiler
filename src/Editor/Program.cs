@@ -1,3 +1,5 @@
+global using System.Diagnostics.CodeAnalysis;
+
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Pug.Compiler.Editor.Endpoints;
@@ -21,3 +23,9 @@ app.AddCompilerEndpoints();
 app.AddSamplesEndpoints();
 
 app.Run();
+
+[ExcludeFromCodeCoverage]
+public partial class Program
+{
+    
+}

@@ -5,7 +5,8 @@ using Pug.Compiler.Runtime;
 
 namespace Pug.Compiler.Editor.Endpoints;
 
-public static class Compiler
+[ExcludeFromCodeCoverage]
+internal static class Compiler
 {
     public static void AddCompilerEndpoints(this IEndpointRouteBuilder endpoints)
     {

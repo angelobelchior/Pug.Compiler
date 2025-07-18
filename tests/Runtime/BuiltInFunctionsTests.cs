@@ -815,4 +815,19 @@ public class BuiltInFunctionsTests
         // Assert
         Assert.Null(exception);
     }
+    
+    [Fact]
+    public void Clear_ShouldThrowExceptionIfInvalidArgsCount()
+    {
+        // Arrange
+        var args = new List<Identifier>
+        {
+            Identifier.Create(DataTypes.Bool, true),
+            Identifier.Create(DataTypes.Int, 10),
+            Identifier.Create(DataTypes.String, "FalseValue")
+        };
+
+        // Act
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke("clear", args));
+    }
 }
