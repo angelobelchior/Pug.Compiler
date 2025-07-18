@@ -18,7 +18,7 @@ public record Result(
     public static Result FromSyntaxParserException(SyntaxParserException se)
         => new(
             se.Tokens ?? [],
-            Variable.ToList(se.Variables ?? []),
+            Variable.ToList(se.Variables ?? new Dictionary<string, Identifier>()),
             se.Identifiers ?? [],
             [se.Message],
             se.CurrentToken, true);

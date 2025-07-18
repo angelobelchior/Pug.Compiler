@@ -173,6 +173,40 @@ public class IdentifierTests
     }
     
     [Theory]
+    [InlineData(DataTypes.Int, "double", 42, DataTypes.Double, 42.0)]
+    [InlineData(DataTypes.Double, "int", 42.5, DataTypes.Int, 42)]
+    [InlineData(DataTypes.String, "string", "test", DataTypes.String, "test")]
+    [InlineData(DataTypes.Bool, "bool", true, DataTypes.Bool, true)]
+    public void Cast_ValidTypeConversion_ShouldReturnCorrectResult(
+        DataTypes initialType, string targetType, object initialValue, DataTypes expectedType, object expectedValue)
+    {
+        // Arrange
+        var identifier = new Identifier(initialType, initialValue);
+
+        // Act
+        var result = identifier.Cast(targetType);
+
+        // Assert
+        Assert.Equal(expectedType, result.DataType);
+        Assert.Equal(expectedValue, result.Value);
+    }
+
+    [Theory]
+    [InlineData(DataTypes.Int, "bool", 42)]
+    [InlineData(DataTypes.Double, "string", 42.5)]
+    [InlineData(DataTypes.Bool, "int", true)]
+    [InlineData(DataTypes.String, "bool", "test")]
+    [InlineData(DataTypes.None, "int", "ihuuuu")]
+    public void Cast_InvalidTypeConversion_ShouldThrowException(DataTypes initialType, string targetType, object initialValue)
+    {
+        // Arrange
+        var identifier = new Identifier(initialType, initialValue);
+
+        // Act & Assert
+        Assert.Throws<SyntaxParserException>(() => identifier.Cast(targetType));
+    }
+    
+    [Theory]
     [InlineData("int", DataTypes.Int, 0)]
     [InlineData("double", DataTypes.Double, 0.0)]
     [InlineData("bool", DataTypes.Bool, false)]
@@ -273,5 +307,75 @@ public class IdentifierTests
         {
             _ = identifier.Value;
         });
+    }
+    
+    [Fact]
+    public void EnsureSameTypes_WithSameNumberTypes_ShouldNotThrowException()
+    {
+        // Arrange
+        var left = new Identifier(DataTypes.Int, 42);
+        var right = new Identifier(DataTypes.Double, 42.5);
+        var @operator = Token.Plus(1);
+
+        // Act & Assert
+        Identifier.EnsureSameTypes(left, right, @operator);
+    }
+
+    [Fact]
+    public void EnsureSameTypes_WithSameDataTypes_ShouldNotThrowException()
+    {
+        // Arrange
+        var left = new Identifier(DataTypes.String, "test");
+        var right = new Identifier(DataTypes.String, "test2");
+        var @operator = Token.Plus(1);
+
+        // Act & Assert
+        Identifier.EnsureSameTypes(left, right, @operator);
+    }
+
+    [Fact]
+    public void EnsureSameTypes_WithDifferentDataTypes_ShouldThrowException()
+    {
+        // Arrange
+        var left = new Identifier(DataTypes.Int, 42);
+        var right = new Identifier(DataTypes.String, "test");
+        var @operator = Token.Plus(1);
+
+        // Act & Assert
+        var exception = Assert.Throws<SyntaxParserException>(() =>
+            Identifier.EnsureSameTypes(left, right, @operator));
+
+        Assert.Equal("Cannot apply Plus operator to different types: Int and String", exception.Message);
+    }
+
+    [Fact]
+    public void EnsureSameTypes_WithNoneDataType_ShouldThrowException()
+    {
+        // Arrange
+        var left = new Identifier(DataTypes.None, None.Value);
+        var right = new Identifier(DataTypes.Int, 42);
+        var @operator = Token.Plus(1);
+
+        // Act & Assert
+        var exception = Assert.Throws<SyntaxParserException>(() =>
+            Identifier.EnsureSameTypes(left, right, @operator));
+
+        Assert.Equal("Cannot apply Plus operator to different types: None and Int", exception.Message);
+    }
+    
+    [Theory]
+    [InlineData(new[] { DataTypes.Int, DataTypes.Double }, true)]
+    [InlineData(new[] { DataTypes.Int }, true)]
+    [InlineData(new[] { DataTypes.Double }, true)]
+    [InlineData(new[] { DataTypes.Int, DataTypes.String }, false)]
+    [InlineData(new[] { DataTypes.None }, false)]
+    [InlineData(new DataTypes[0], true)] // Caso vazio
+    public void AllAreNumberTypes_ShouldReturnExpectedResult(DataTypes[] types, bool expected)
+    {
+        // Act
+        var result = Identifier.AllAreNumberTypes(types);
+
+        // Assert
+        Assert.Equal(expected, result);
     }
 }

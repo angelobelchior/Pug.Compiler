@@ -116,7 +116,10 @@ public class Identifier(DataTypes dataType, object value)
     {
         if (value is int i)
             return i;
-        
+
+        if (value is double d)
+            return (int)Math.Round(d);
+
         var @string = ToString();
         var success = int.TryParse(@string, out var result);
         if (!success)
@@ -129,7 +132,7 @@ public class Identifier(DataTypes dataType, object value)
     {
         if (value is bool b)
             return b;
-        
+
         var @string = ToString();
         var success = bool.TryParse(@string, out var result);
         if (!success)

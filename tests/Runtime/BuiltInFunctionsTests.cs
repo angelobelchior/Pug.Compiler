@@ -38,6 +38,9 @@ public class BuiltInFunctionsTests
     [InlineData("iif")]
     [InlineData("read")]
     [InlineData("clear")]
+    [InlineData("upper")]
+    [InlineData("lower")]
+    [InlineData("replace")]
     public void Contains_ShouldReturnTrue_WhenFunctionExists(string funcion)
     {
         Assert.True(BuiltInFunctions.Contains(funcion));
@@ -265,6 +268,53 @@ public class BuiltInFunctionsTests
 
         Assert.Equal(DataTypes.Double, result.DataType);
         Assert.True(result.ToDouble() >= 2 && result.ToDouble() < 3);
+    }
+    
+    [Fact]
+    public void Random_ShouldReturnValueBetweenZeroAndMax_WhenOneArgumentProvided()
+    {
+        // Arrange
+        var args = new List<Identifier> { Identifier.Create(DataTypes.Int, 10) };
+
+        // Act
+        var result = BuiltInFunctions.Invoke("random", args);
+
+        // Assert
+        Assert.Equal(DataTypes.Double, result.DataType);
+        Assert.InRange(result.ToDouble(), 0, 10);
+    }
+
+    [Fact]
+    public void Random_ShouldReturnValueBetweenMinAndMax_WhenTwoArgumentsProvided()
+    {
+        // Arrange
+        var args = new List<Identifier>
+        {
+            Identifier.Create(DataTypes.Int, 5),
+            Identifier.Create(DataTypes.Int, 15)
+        };
+
+        // Act
+        var result = BuiltInFunctions.Invoke("random", args);
+
+        // Assert
+        Assert.Equal(DataTypes.Double, result.DataType);
+        Assert.InRange(result.ToDouble(), 5, 15);
+    }
+
+    [Fact]
+    public void Random_ShouldThrowException_WhenInvalidArgumentsProvided()
+    {
+        // Arrange
+        var args = new List<Identifier>
+        {
+            Identifier.Create(DataTypes.Int, 1),
+            Identifier.Create(DataTypes.Int, 2),
+            Identifier.Create(DataTypes.Int, 3)
+        };
+
+        // Act & Assert
+        Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke("random", args));
     }
 
     [Fact]
@@ -829,5 +879,52 @@ public class BuiltInFunctionsTests
 
         // Act
         Assert.Throws<SyntaxParserException>(() => BuiltInFunctions.Invoke("clear", args));
+    }
+    
+    [Fact]
+    public void Upper_ShouldConvertStringToUpperCase()
+    {
+        // Arrange
+        var args = new List<Identifier> { Identifier.Create(DataTypes.String, "test") };
+
+        // Act
+        var result = BuiltInFunctions.Invoke("upper", args);
+
+        // Assert
+        Assert.Equal("TEST", result.ToString());
+        Assert.Equal(DataTypes.String, result.DataType);
+    }
+
+    [Fact]
+    public void Lower_ShouldConvertStringToLowerCase()
+    {
+        // Arrange
+        var args = new List<Identifier> { Identifier.Create(DataTypes.String, "TEST") };
+
+        // Act
+        var result = BuiltInFunctions.Invoke("lower", args);
+
+        // Assert
+        Assert.Equal("test", result.ToString());
+        Assert.Equal(DataTypes.String, result.DataType);
+    }
+
+    [Fact]
+    public void Replace_ShouldReplaceSubstringInString()
+    {
+        // Arrange
+        var args = new List<Identifier>
+        {
+            Identifier.Create(DataTypes.String, "hello world"),
+            Identifier.Create(DataTypes.String, "world"),
+            Identifier.Create(DataTypes.String, "xunit")
+        };
+
+        // Act
+        var result = BuiltInFunctions.Invoke("replace", args);
+
+        // Assert
+        Assert.Equal("hello xunit", result.ToString());
+        Assert.Equal(DataTypes.String, result.DataType);
     }
 }

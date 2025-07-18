@@ -29,7 +29,7 @@ public static class BuiltInFunctions
         ["atn"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Double, Math.Atan(args[0].ToDouble()))
             : throw SyntaxParserException("Invalid number of arguments for atn", "atn"),
-        
+
         ["abs"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Double, Math.Abs(args[0].ToDouble()))
             : throw SyntaxParserException("Invalid number of arguments for abs", "abs"),
@@ -37,7 +37,7 @@ public static class BuiltInFunctions
         ["sgn"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Int, args[0].ToDouble() < 0 ? -1 : (args[0].ToDouble() == 0 ? 0 : 1))
             : throw SyntaxParserException("Invalid number of arguments for sgn", "sgn"),
-        
+
         ["sqrt"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Double, Math.Sqrt(args[0].ToDouble()))
             : throw SyntaxParserException("Invalid number of arguments for sqrt", "sqrt"),
@@ -94,31 +94,32 @@ public static class BuiltInFunctions
             3 => Identifier.Create(DataTypes.String, args[0].ToString().Substring(args[1].ToInt(), args[2].ToInt())),
             _ => throw SyntaxParserException("Invalid number of arguments for substr", "substr")
         },
-        
+
         ["left"] = args => args.Count == 2
             ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(0, args[1].ToInt()))
             : throw SyntaxParserException("Invalid number of arguments for left", "left"),
-        
+
         ["right"] = args => args.Count == 2
-            ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(args[0].ToString().Length - args[1].ToInt()))
+            ? Identifier.Create(DataTypes.String,
+                args[0].ToString().Substring(args[0].ToString().Length - args[1].ToInt()))
             : throw SyntaxParserException("Invalid number of arguments for right", "right"),
-        
+
         ["mid"] = args => args.Count == 3
             ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(args[1].ToInt(), args[2].ToInt()))
             : throw SyntaxParserException("Invalid number of arguments for mid", "mid"),
-        
+
         ["trim"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.String, args[0].ToString().Trim())
             : throw SyntaxParserException("Invalid number of arguments for trim", "trim"),
-        
+
         ["trim_end"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.String, args[0].ToString().TrimEnd())
             : throw SyntaxParserException("Invalid number of arguments for trim", "trim_end"),
-        
+
         ["trim_start"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.String, args[0].ToString().TrimStart())
             : throw SyntaxParserException("Invalid number of arguments for trim", "trim_start"),
-        
+
         ["to_str"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.String, args[0])
             : throw SyntaxParserException("Invalid number of arguments for to_string", "to_str"),
@@ -126,11 +127,11 @@ public static class BuiltInFunctions
         ["to_bool"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Bool, args[0])
             : throw SyntaxParserException("Invalid number of arguments for to_bool", "to_bool"),
-        
+
         ["to_int"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Int, Math.Floor(args[0].ToDouble()))
             : throw SyntaxParserException("Invalid number of arguments for int", "to_int"),
-        
+
         ["to_double"] = args => args.Count == 1
             ? Identifier.Create(DataTypes.Double, args[0])
             : throw SyntaxParserException("Invalid number of arguments for double", "to_double"),
@@ -158,7 +159,7 @@ public static class BuiltInFunctions
 
             return Identifier.None;
         },
-        
+
         ["read"] = args =>
         {
             if (args.Count != 0)
@@ -172,7 +173,7 @@ public static class BuiltInFunctions
         {
             if (args.Count != 0)
                 throw SyntaxParserException("Invalid number of arguments for clear", "clear");
-            
+
             Console.Clear();
 
             return Identifier.None;
@@ -183,15 +184,10 @@ public static class BuiltInFunctions
         => Functions.ContainsKey(functionName);
 
     public static Identifier Invoke(string functionName, List<Identifier> args)
-    {
-        var result = Functions.TryGetValue(functionName, out var function)
+        => Functions.TryGetValue(functionName, out var function)
             ? function(args)
             : throw SyntaxParserException($"Function {functionName} not found", functionName);
 
-        return result;
-    }
-
-    private static SyntaxParserException SyntaxParserException(
-        string message, string functionName)
+    private static SyntaxParserException SyntaxParserException(string message, string functionName)
         => new(message, Token.Function(0, functionName), [], new Dictionary<string, Identifier>(), []);
 }

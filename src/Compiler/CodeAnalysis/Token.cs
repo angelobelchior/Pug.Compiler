@@ -24,7 +24,6 @@ public class Token
     public const string FALSE = "false";
 
     public const string IF = "if";
-    // public const string THEN = "then";
     public const string ELSE = "else";
     public const string END = "end";
     public const char GREATER = '>';
