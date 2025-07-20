@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Pug.Compiler.Runtime;
 
@@ -186,9 +187,6 @@ public class Lexer
             Next();
         }
 
-        if (hasDot && !double.TryParse(number.ToString(), out _))
-            throw LexerException($"Invalid number format: {number}");
-
         return Token.Number(position, number.ToString());
     }
 
@@ -240,6 +238,7 @@ public class Lexer
             _currentChar);
 }
 
+[ExcludeFromCodeCoverage]
 public class LexerException(string message, List<Token> tokens, int currentPosition, char currentChar)
     : Exception(message)
 {

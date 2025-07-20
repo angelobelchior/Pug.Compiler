@@ -162,7 +162,7 @@ public class TokenTests
     public void Function_ShouldCreateCorrectToken()
     {
         var position = 12;
-        var value = "myFunction";
+        var value = "my_function";
         var token = Token.Function(position, value);
 
         Assert.Equal(TokenType.Function, token.Type);

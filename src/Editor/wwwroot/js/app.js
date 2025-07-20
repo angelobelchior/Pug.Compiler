@@ -61,7 +61,7 @@ function configureEditor() {
             ],
             folding: {
                 markers: {
-                    start: /^(if|else|func|end|then|return)\b/,
+                    start: /^(if|else|end|return)\b/,
                     end: /^(end)\b/
                 }
             }

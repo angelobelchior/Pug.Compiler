@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Pug.Compiler.Runtime;
 
@@ -424,6 +425,7 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
             _identifiers);
 }
 
+[ExcludeFromCodeCoverage]
 public class SyntaxParserException(
     string message,
     Token? currentToken = null,
