@@ -25,8 +25,8 @@ function configureEditor() {
                 root: [
                     [/\/\/.*/, 'comment'],
                     [/\b(log|exp|sin|cos|tan|atn|abs|sgn|left|right|mid|trim|trim_end|trim_start|to_string|to_bool|to_int|to_double|print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear|iif)\b/, 'function'],
-                    [/\b(true|false|func|if|else|end)\b/, 'keyword'],
-                    [/\b(int|string|double|bool)\b/, 'type'],
+                    [/\b(true|false|if|else|end|while)\b/, 'keyword'],
+                    [/(int|string|double|bool)\s+([a-zA-Z_][a-zA-Z0-9_]*)/, 'type'],
                     [/\b(==|=|\+|-|\*|\/|%|&&|\|\|)\b/, 'operator'],
                     [/\b\d+\b/, 'number'],
                     [/"([^"\\]|\\.)*"/, 'string'],
@@ -41,7 +41,23 @@ function configureEditor() {
                 {token: 'function', foreground: '#39CC9A'},
                 {token: 'keyword', foreground: '#569CD6'},
                 {token: 'type', foreground: '#569CD6'},
-                //{token: 'comment', foreground: '#8FBC8F'}
+                {token: 'variable', foreground: '#FFB86C'},
+                {token: 'comment', foreground: '#8FBC8F'}
+            ],
+            colors: {
+                'editor.foreground': '#FFFFFF',
+                'editor.background': '#1E1E1E'
+            }
+        });
+        monaco.editor.defineTheme('pug-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+                {token: 'function', foreground: '#39CC9A'},
+                {token: 'keyword', foreground: '#569CD6'},
+                {token: 'type', foreground: '#569CD6'},
+                {token: 'variable', foreground: '#FFB86C'},
+                {token: 'comment', foreground: '#8FBC8F'}
             ],
             colors: {
                 'editor.foreground': '#FFFFFF',
@@ -61,7 +77,7 @@ function configureEditor() {
             ],
             folding: {
                 markers: {
-                    start: /^(if|else|end|return)\b/,
+                    start: /^(if|else|end|while|return)\b/,
                     end: /^(end)\b/
                 }
             }
