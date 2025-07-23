@@ -62,6 +62,60 @@ public record Sample(string Title, string Code)
                 """
             ),
             
+            new("While Loop",
+                """
+                int i = 0
+                while i < 5
+                    print("i is " + i)
+                    i = i + 1
+                end
+                print("Loop finished")
+                """
+            ),
+            
+            new("While with Conditionals",
+                """
+                int i
+                while i < 5
+                    if i % 2 == 0
+                        print(i + " é par")
+                    else
+                        print(i + " é ímpar")
+                    end
+                    i = i + 1
+                end
+                """
+            ),
+            
+            new("While - Table Multiplication",
+                """
+                int i = 1
+                while i <= 10
+                    int j = 1
+                    while  j <= 10
+                        print(i + "x" + j + "=" + i * j)
+                        j = j + 1
+                    end
+                    print("=========")
+                    i = i + 1
+                end
+                """
+            ),
+            
+            new("While - Factorial",
+                """
+                int n = 10          
+                int result = 1     
+                int i = 1          
+                
+                while i <= n
+                    result = result * i
+                    i = i + 1
+                end
+                print("Fatorial de " + n + " = " + result)
+                """
+            ),
+            
             new("Built-In Functions",
                 """
                 int raiz = sqrt(4)
