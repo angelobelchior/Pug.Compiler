@@ -28,6 +28,7 @@ public enum TokenType
     If,
     Else,
     End,
+    While,
     
     Equal,
     NotEqual,

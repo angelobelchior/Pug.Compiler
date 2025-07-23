@@ -92,6 +92,9 @@ public class Lexer
 
         if (identifier.Value == Token.END)
             return Token.End(position);
+        
+        if (identifier.Value == Token.WHILE)
+            return Token.While(position);
 
         return Token.Identifier(position, identifier.Value);
     }

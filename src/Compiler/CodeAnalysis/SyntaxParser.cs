@@ -90,6 +90,7 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
         => CurrentToken.Type switch
         {
             TokenType.If => EvaluateIf(),
+            TokenType.While => EvaluateWhile(),
             TokenType.DataType => EvaluateDataType(),
             TokenType.Identifier => EvaluateIdentifier(),
             TokenType.Function => EvaluateFunction(),
@@ -124,6 +125,30 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
         return condition;
     }
 
+    private Identifier EvaluateWhile()
+    {
+        NextIfTokenIs(TokenType.While);
+        var whilePosition = _currentPosition;
+
+        while (true)
+        {
+            var condition = EvaluateExpression();
+            if (condition.ToBool())
+            {
+                ParseBlock(TokenType.End);
+                _currentPosition = whilePosition;
+            }
+            else
+            {
+                SkipBlockUntil(TokenType.End);
+                break;
+            }
+        }
+
+        NextIfTokenIs(TokenType.End);
+        return Identifier.None;
+    }
+
     private void ParseBlock(params TokenType[] delimiters)
     {
         while (!delimiters.Contains(CurrentToken.Type) && CurrentToken.Type != TokenType.EndOfFile)
@@ -132,16 +157,16 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
 
     private void SkipBlockUntil(params TokenType[] delimiters)
     {
-        var nestedIfCount = 0;
+        var nestedCount = 0;
         while (CurrentToken.Type != TokenType.EndOfFile)
         {
-            if (delimiters.Contains(CurrentToken.Type) && nestedIfCount == 0)
+            if (delimiters.Contains(CurrentToken.Type) && nestedCount == 0)
                 return;
 
-            if (CurrentToken.Type == TokenType.If)
-                nestedIfCount++;
-            else if (CurrentToken.Type == TokenType.End && nestedIfCount > 0)
-                nestedIfCount--;
+            if (CurrentToken.Type is TokenType.If or TokenType.While)
+                nestedCount++;
+            else if (CurrentToken.Type == TokenType.End && nestedCount > 0)
+                nestedCount--;
 
             _currentPosition++;
         }
