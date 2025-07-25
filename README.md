@@ -9,7 +9,43 @@ Essa construção será dividida em partes e cada parte terá um post e uma bran
 Cada post vai conter a explicação e implementação de uma ou mais funcionalidades do compilador e sempre estará associado a uma branch (parte1, parte2, etc.).
 
 
-A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 5](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-5-2hoi).
+A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 6](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-6-2ccm).
+
+----
+
+## Parte 6
+
+**Link para o Post:**
+- https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-6-2ccm
+
+**Link para a Branch:**
+- https://github.com/angelobelchior/Pug.Compiler/tree/parte6
+
+**Funcionalidades:**
+- Suporte a while
+- Melhoria e inclusão de testes unitários
+
+```bash
+int n = 10          
+int result = 1     
+int i = 1          
+while i <= n
+    result = result * i
+    i = i + 1
+end
+print("Fatorial de " + n + " = " + result)
+
+> acesso permitido
+
+//--
+
+if 4 % 2 == 0
+    print("É par")
+else
+    print("É ímpar")
+end
+
+> Fatorial de 10 = 3628800
 
 ----
 
