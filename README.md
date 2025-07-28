@@ -23,7 +23,9 @@ A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará c
 
 **Funcionalidades:**
 - Suporte a while
+- Correção na identificação do tipo numérico (`double` e `int`). Antes todo resultado de expressão era considerado `double`, agora o tipo é identificado corretamente.
 - Melhoria e inclusão de testes unitários
+- Inclusão de vários exemplos de código (verificar números primos e palíndromos, converter decimal para binário, inverter `string`, Célsius para Fahrenheit, etc.) além de dar um tapinha na nossa “IDE”.
 
 ```bash
 int n = 10          
@@ -47,6 +49,16 @@ end
 
 > Fatorial de 10 = 3628800
 
+//--
+
+int numero = 1984
+string binario = ""
+while numero > 0
+    int resto = numero % 2
+    binario = resto + binario
+    numero = to_int(numero / 2)
+end
+print("Binário = " + binario)
 ----
 
 ## Parte 5

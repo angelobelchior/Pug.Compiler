@@ -94,6 +94,12 @@ public static class BuiltInFunctions
             3 => Identifier.Create(DataTypes.String, args[0].ToString().Substring(args[1].ToInt(), args[2].ToInt())),
             _ => throw SyntaxParserException("Invalid number of arguments for substr", "substr")
         },
+        
+        ["char_at"] = args => args.Count switch
+        {
+            2 => Identifier.Create(DataTypes.String, args[0].ToString()[args[1].ToInt()]),
+            _ => throw SyntaxParserException("Invalid number of arguments for char_at", "char_at")
+        },
 
         ["left"] = args => args.Count == 2
             ? Identifier.Create(DataTypes.String, args[0].ToString().Substring(0, args[1].ToInt()))

@@ -44,8 +44,11 @@ public class Identifier(DataTypes dataType, object value)
     public static Identifier FromToken(Token token)
         => token.Type switch
         {
-            TokenType.Number => new Identifier(DataTypes.Double,
-                double.Parse(token.Value, CultureInfo.InvariantCulture)),
+            TokenType.Number => token.Value.Contains('.')
+                ? new Identifier(DataTypes.Double,
+                    double.Parse(token.Value, CultureInfo.InvariantCulture))
+                : new Identifier(DataTypes.Int,
+                    double.Parse(token.Value, CultureInfo.InvariantCulture)),
             TokenType.Bool => new Identifier(DataTypes.Bool, token.Value),
             TokenType.String => new Identifier(DataTypes.String, token.Value),
             _ => throw new SyntaxParserException($"Invalid token type: {token.Type}")

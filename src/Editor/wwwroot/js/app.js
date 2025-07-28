@@ -24,7 +24,7 @@ function configureEditor() {
             tokenizer: {
                 root: [
                     [/\/\/.*/, 'comment'],
-                    [/\b(log|exp|sin|cos|tan|atn|abs|sgn|left|right|mid|trim|trim_end|trim_start|to_string|to_bool|to_int|to_double|print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|clear|iif)\b/, 'function'],
+                    [/\b(log|exp|sin|cos|tan|atn|abs|sgn|left|right|mid|trim|trim_end|trim_start|to_string|to_bool|to_int|to_double|print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|char_at|clear|iif)\b/, 'function'],
                     [/\b(true|false|if|else|end|while)\b/, 'keyword'],
                     [/(int|string|double|bool)\s+([a-zA-Z_][a-zA-Z0-9_]*)/, 'type'],
                     [/\b(==|=|\+|-|\*|\/|%|&&|\|\|)\b/, 'operator'],
@@ -40,7 +40,7 @@ function configureEditor() {
             rules: [
                 {token: 'function', foreground: '#39CC9A'},
                 {token: 'keyword', foreground: '#569CD6'},
-                {token: 'type', foreground: '#569CD6'},
+                {token: 'type', foreground: '#FFB86C'},
                 {token: 'variable', foreground: '#FFB86C'},
                 {token: 'comment', foreground: '#8FBC8F'}
             ],

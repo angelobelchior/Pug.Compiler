@@ -327,7 +327,11 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
             _ => throw SyntaxParserException($"Unexpected token: {@operator.Type}")
         };
 
-        return new Identifier(DataTypes.Double, value);
+        var dataType = left.DataType == DataTypes.Double || right.DataType == DataTypes.Double
+            ? DataTypes.Double
+            : DataTypes.Int;
+
+        return new Identifier(dataType, value);
     }
 
     private Identifier EvaluateAssignment()
