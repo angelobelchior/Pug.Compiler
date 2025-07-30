@@ -43,7 +43,7 @@ while (true)
 
         var syntaxParser = new SyntaxParser(identifiers, tokens);
         var results = syntaxParser.Evaluate();
-
+        
         foreach (var result in results.Where(result => result.DataType != DataTypes.None))
             WriteLine(result.Value, ConsoleColor.Blue);
     }
@@ -68,8 +68,8 @@ static void PrintTokens(IEnumerable<Token> tokens)
         Console.WriteLine(token);
 }
 
-namespace Pug.Compiler
+[ExcludeFromCodeCoverage]
+public partial class Program
 {
-    [ExcludeFromCodeCoverage]
-    public partial class Program;
+    
 }

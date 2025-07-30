@@ -2,6 +2,7 @@ using Pug.Compiler.Runtime;
 
 namespace Pug.Compiler.Editor.Endpoints.Models;
 
+[ExcludeFromCodeCoverage]
 public record Variable(
     string Name,
     DataTypes DataType,

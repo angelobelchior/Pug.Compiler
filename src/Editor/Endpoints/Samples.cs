@@ -1,6 +1,7 @@
 namespace Pug.Compiler.Editor.Endpoints;
 
-public static class Samples
+[ExcludeFromCodeCoverage]
+internal static class Samples
 {
     public static void AddSamplesEndpoints(this IEndpointRouteBuilder endpoints)
     {

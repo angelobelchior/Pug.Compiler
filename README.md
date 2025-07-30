@@ -9,8 +9,56 @@ Essa construção será dividida em partes e cada parte terá um post e uma bran
 Cada post vai conter a explicação e implementação de uma ou mais funcionalidades do compilador e sempre estará associado a uma branch (parte1, parte2, etc.).
 
 
-A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 5](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-5-2hoi).
+A [branch main](https://github.com/angelobelchior/Pug.Compiler) sempre estará com o código referente ao post mais recente. Nesse caso estamos na [parte 6](https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-6-2ccm).
 
+----
+
+## Parte 6
+
+**Link para o Post:**
+- https://dev.to/angelobelchior/reinventando-a-roda-criando-um-compilador-em-csharp-parte-6-2ccm
+
+**Link para a Branch:**
+- https://github.com/angelobelchior/Pug.Compiler/tree/parte6
+
+**Funcionalidades:**
+- Suporte a while
+- Correção na identificação do tipo numérico (`double` e `int`). Antes todo resultado de expressão era considerado `double`, agora o tipo é identificado corretamente.
+- Melhoria e inclusão de testes unitários
+- Inclusão de vários exemplos de código (verificar números primos e palíndromos, converter decimal para binário, inverter `string`, Célsius para Fahrenheit, etc.) além de dar um tapinha na nossa “IDE”.
+
+```bash
+int n = 10          
+int result = 1     
+int i = 1          
+while i <= n
+    result = result * i
+    i = i + 1
+end
+print("Fatorial de " + n + " = " + result)
+
+> acesso permitido
+
+//--
+
+if 4 % 2 == 0
+    print("É par")
+else
+    print("É ímpar")
+end
+
+> Fatorial de 10 = 3628800
+
+//--
+
+int numero = 1984
+string binario = ""
+while numero > 0
+    int resto = numero % 2
+    binario = resto + binario
+    numero = to_int(numero / 2)
+end
+print("Binário = " + binario)
 ----
 
 ## Parte 5

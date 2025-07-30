@@ -1,3 +1,4 @@
+global using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Pug.Compiler.Editor.Endpoints;
@@ -8,6 +9,8 @@ builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.SerializerOptions.NumberHandling =
+        JsonNumberHandling.AllowNamedFloatingPointLiterals;
 });
 
 var app = builder.Build();
@@ -21,3 +24,8 @@ app.AddCompilerEndpoints();
 app.AddSamplesEndpoints();
 
 app.Run();
+
+[ExcludeFromCodeCoverage]
+public partial class Program
+{
+}
