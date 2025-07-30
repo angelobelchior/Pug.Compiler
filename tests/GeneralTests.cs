@@ -143,8 +143,8 @@ public class GeneralTests(SharedValue sharedValue)
     [InlineData("double x = \"abcd\"", "Invalid type string. Expected a double")]
     [InlineData("bool x = 12234", "Invalid type int or double. Expected a bool")]
     [InlineData("bool x = \"abcd\"", "Invalid type string. Expected a bool")]
-    [InlineData("1 == \"abcd\"", "Cannot apply Equal operator to different types: Double and String")]
-    [InlineData("1 != \"abcd\"", "Cannot apply NotEqual operator to different types: Double and String")]
+    [InlineData("1 == \"abcd\"", "Cannot apply Equal operator to different types: Int and String")]
+    [InlineData("1.7 != \"abcd\"", "Cannot apply NotEqual operator to different types: Double and String")]
     public void Invalid_Functions_Must_Throw_Exception(
         string expression,
         string exceptionMessage)

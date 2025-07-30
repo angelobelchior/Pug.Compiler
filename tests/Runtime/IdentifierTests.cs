@@ -93,8 +93,14 @@ public class IdentifierTests
         var token = Token.Number(1, "42");
         var result = Identifier.FromToken(token);
 
-        Assert.Equal(DataTypes.Double, result.DataType);
+        Assert.Equal(DataTypes.Int, result.DataType);
         Assert.Equal("42", result.Value.ToString());
+        
+        token = Token.Number(1, "42.37");
+        result = Identifier.FromToken(token);
+
+        Assert.Equal(DataTypes.Double, result.DataType);
+        Assert.Equal("42,37", result.Value.ToString());
     }
 
     [Fact]
