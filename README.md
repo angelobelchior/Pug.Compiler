@@ -37,7 +37,7 @@ while i <= n
 end
 print("Fatorial de " + n + " = " + result)
 
-> acesso permitido
+> Fatorial de 10 = 3628800
 
 //--
 
@@ -47,7 +47,7 @@ else
     print("É ímpar")
 end
 
-> Fatorial de 10 = 3628800
+> É par
 
 //--
 
@@ -59,6 +59,8 @@ while numero > 0
     numero = to_int(numero / 2)
 end
 print("Binário = " + binario)
+
+> Binário = 11111000000
 ```
 
 ----
