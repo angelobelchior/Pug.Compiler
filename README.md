@@ -59,6 +59,8 @@ while numero > 0
     numero = to_int(numero / 2)
 end
 print("Binário = " + binario)
+```
+
 ----
 
 ## Parte 5
