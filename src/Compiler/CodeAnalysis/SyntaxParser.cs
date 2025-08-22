@@ -6,6 +6,9 @@ namespace Pug.Compiler.CodeAnalysis;
 
 public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> tokens)
 {
+    private readonly TokenType[] _blockInitializers = [TokenType.If, TokenType.While, TokenType.For];
+    private readonly TokenType[] _blockDelimiters = [TokenType.Else, TokenType.End];
+
     private int _currentPosition;
 
     private Token CurrentToken
@@ -91,6 +94,7 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
         {
             TokenType.If => EvaluateIf(),
             TokenType.While => EvaluateWhile(),
+            TokenType.For => EvaluateFor(),
             TokenType.DataType => EvaluateDataType(),
             TokenType.Identifier => EvaluateIdentifier(),
             TokenType.Function => EvaluateFunction(),
@@ -108,17 +112,17 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
         var condition = EvaluateExpression();
 
         if (condition.ToBool())
-            ParseBlock(TokenType.Else, TokenType.End);
+            ParseBlock();
         else
-            SkipBlockUntil(TokenType.Else, TokenType.End);
+            SkipBlockUntil();
 
         if (CurrentToken.Type == TokenType.Else)
         {
             NextIfTokenIs(TokenType.Else);
             if (!condition.ToBool())
-                ParseBlock(TokenType.End);
+                ParseBlock();
             else
-                SkipBlockUntil(TokenType.End);
+                SkipBlockUntil();
         }
 
         NextIfTokenIs(TokenType.End);
@@ -135,12 +139,12 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
             var condition = EvaluateExpression();
             if (condition.ToBool())
             {
-                ParseBlock(TokenType.End);
+                ParseBlock();
                 _currentPosition = whilePosition;
             }
             else
             {
-                SkipBlockUntil(TokenType.End);
+                SkipBlockUntil();
                 break;
             }
         }
@@ -149,21 +153,67 @@ public class SyntaxParser(Dictionary<string, Identifier> variables, List<Token> 
         return Identifier.None;
     }
 
-    private void ParseBlock(params TokenType[] delimiters)
+    private Identifier EvaluateFor()
     {
-        while (!delimiters.Contains(CurrentToken.Type) && CurrentToken.Type != TokenType.EndOfFile)
+        NextIfTokenIs(TokenType.For);
+
+        NextIfTokenIs(TokenType.DataType);
+        var variableToken = NextIfTokenIs(TokenType.Identifier);
+        var variableName = variableToken.Value;
+
+        var from = new Identifier(DataTypes.Int, 1);
+        if (CurrentToken.Type == TokenType.Assign)
+        {
+            NextIfTokenIs(TokenType.Assign);
+            from = EvaluateExpression();
+        }
+        variables[variableName] = from;
+
+        NextIfTokenIs(TokenType.To);
+        var to = EvaluateExpression();
+
+        var stepValue = 1;
+        if (CurrentToken.Type == TokenType.Step)
+        {
+            NextIfTokenIs(TokenType.Step);
+            var step = EvaluateExpression();
+            stepValue = step.ToInt();
+        }
+
+        var forPosition = _currentPosition;
+
+        var end = to.ToInt();
+        while (
+            (stepValue > 0 && variables[variableName].ToInt() <= end) ||
+            (stepValue < 0 && variables[variableName].ToInt() >= end)
+        )
+        {
+            ParseBlock();
+            variables[variableName] = new Identifier(DataTypes.Int, variables[variableName].ToInt() + stepValue);
+            _currentPosition = forPosition;
+        }
+
+        SkipBlockUntil();
+
+        NextIfTokenIs(TokenType.End);
+        return Identifier.None;
+    }
+
+    private void ParseBlock()
+    {
+        while (!_blockDelimiters.Contains(CurrentToken.Type) && CurrentToken.Type != TokenType.EndOfFile)
             EvaluateToken();
     }
 
-    private void SkipBlockUntil(params TokenType[] delimiters)
+    private void SkipBlockUntil()
     {
         var nestedCount = 0;
         while (CurrentToken.Type != TokenType.EndOfFile)
         {
-            if (delimiters.Contains(CurrentToken.Type) && nestedCount == 0)
+            if (_blockDelimiters.Contains(CurrentToken.Type) && nestedCount == 0)
                 return;
 
-            if (CurrentToken.Type is TokenType.If or TokenType.While)
+            if (_blockInitializers.Contains(CurrentToken.Type))
                 nestedCount++;
             else if (CurrentToken.Type == TokenType.End && nestedCount > 0)
                 nestedCount--;

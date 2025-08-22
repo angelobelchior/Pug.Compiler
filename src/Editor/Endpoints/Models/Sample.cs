@@ -208,6 +208,67 @@ public record Sample(string Title, string Code)
                     count = count + 1
                 end
                 """),
+            
+            new("For: Even or Odd",
+                """
+                for int i = 1 to 5
+                    if i % 2 == 0
+                        print(i + " é par")
+                    else
+                        print(i + " é ímpar")
+                    end
+                end
+                """
+            ),
+
+            new("Reverse String",
+                """
+                string texto = "angelo"
+                int i = len(texto) - 1
+                string invertido = ""
+                while i >= 0
+                    invertido = invertido + char_at(texto, i)
+                    i = i - 1
+                end
+                print("Texto invertido = " + invertido)
+                """
+            ),
+
+            new("For: Table Multiplication",
+                """
+                for int i = 1 to 10
+                    for int j = 1 to 10
+                        print(i + "x" + j + "=" + i * j)
+                    end
+                    print("-------")
+                end
+                """
+            ),
+
+            new("For: Factorial",
+                """
+                int n = 10          
+                int result = 1     
+
+                for int i = 1 to n
+                    result = result * i
+                end
+                print("Fatorial de " + n + " = " + result)
+                """
+            ),
+
+            new("For: Fibonacci",
+                """
+                int a = 0
+                int b = 1
+
+                for int i = 1 to 10
+                    print("Fibonacci(" + i + ") = " + a)
+                    int temp = a + b
+                    a = b
+                    b = temp
+                end
+                """),
 
             new("Built-In Functions",
                 """
