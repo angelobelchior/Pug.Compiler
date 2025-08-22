@@ -29,6 +29,9 @@ public enum TokenType
     Else,
     End,
     While,
+    For,
+    To,
+    Step,
     
     Equal,
     NotEqual,

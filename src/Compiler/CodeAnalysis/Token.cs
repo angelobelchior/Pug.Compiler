@@ -27,6 +27,9 @@ public class Token
     public const string ELSE = "else";
     public const string END = "end";
     public const string WHILE = "while";
+    public const string FOR = "for";
+    public const string TO = "to";
+    public const string STEP = "step";
     public const char GREATER = '>';
     public const char LESS = '<';
     public const char NOT = '!';
@@ -105,6 +108,15 @@ public class Token
     
     public static Token While(int position)
         => new(TokenType.While, WHILE, position);
+    
+    public static Token For(int position)
+        => new(TokenType.For, FOR, position);
+    
+    public static Token To(int position)
+        => new(TokenType.To, TO, position);
+    
+    public static Token Step(int position)
+        => new(TokenType.Step, STEP, position);
 
     public static Token End(int position)
         => new(TokenType.End, END, position);

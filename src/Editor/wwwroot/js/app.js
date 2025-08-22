@@ -25,7 +25,7 @@ function configureEditor() {
                 root: [
                     [/\/\/.*/, 'comment'],
                     [/\b(log|exp|sin|cos|tan|atn|abs|sgn|left|right|mid|trim|trim_end|trim_start|to_string|to_bool|to_int|to_double|print|max|min|sqrt|random|pow|round|upper|lower|len|replace|substr|char_at|clear|iif)\b/, 'function'],
-                    [/\b(true|false|if|else|end|while)\b/, 'keyword'],
+                    [/\b(true|false|if|else|end|while|for|to|step)\b/, 'keyword'],
                     [/(int|string|double|bool)\s+([a-zA-Z_][a-zA-Z0-9_]*)/, 'type'],
                     [/\b(==|=|\+|-|\*|\/|%|&&|\|\|)\b/, 'operator'],
                     [/\b\d+\b/, 'number'],
@@ -77,7 +77,7 @@ function configureEditor() {
             ],
             folding: {
                 markers: {
-                    start: /^(if|else|end|while|return)\b/,
+                    start: /^(if|else|end|while|for)\b/,
                     end: /^(end)\b/
                 }
             }
